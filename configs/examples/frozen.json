@@ -1,0 +1,133 @@
+{
+  "format": 1,
+  "workflow": "standard",
+  "config": {
+    "num_epochs": 50,
+    "batch_size": 256,
+    "lr": 0.001,
+    "weight_decay": 0.0,
+    "momentum": 0.9,
+    "num_bins": 15,
+    "use_amp": false,
+    "head_hidden_dims": [
+      128,
+      64
+    ],
+    "depth_sweep": [
+      [],
+      [
+        128
+      ],
+      [
+        128,
+        64
+      ],
+      [
+        256,
+        256,
+        128,
+        64
+      ]
+    ],
+    "schedule": "constant",
+    "onset": 1,
+    "nescal": {
+      "k": 10,
+      "mask_mode": "none",
+      "divergence_type": "js",
+      "weight_type": "topk",
+      "tau": 1.0
+    },
+    "candidate_onsets": [
+      1,
+      3,
+      5,
+      10,
+      20,
+      30
+    ],
+    "lambda_grid_cosine": [
+      0.01,
+      0.05,
+      0.1,
+      0.3,
+      0.5,
+      0.7,
+      1.0,
+      2.0
+    ],
+    "lambda_grid_constant": [
+      0.01,
+      0.05,
+      0.1,
+      0.3,
+      0.5,
+      0.7,
+      1.0,
+      2.0
+    ],
+    "lambda_ref": 3.0,
+    "selection_mode": "joint",
+    "stage_b_seeds": [
+      18,
+      42
+    ],
+    "confirmatory_seeds": [
+      613,
+      2026
+    ],
+    "ablation_seeds": [
+      18,
+      42
+    ],
+    "ablations": {
+      "divergence": [
+        "js",
+        "l2",
+        "kl",
+        "fisher"
+      ],
+      "mask": [
+        "hard"
+      ],
+      "k": [
+        5,
+        10,
+        50
+      ],
+      "graph": [],
+      "penalty_target": 3.0
+    },
+    "heuristic_seeds": [
+      18,
+      42
+    ],
+    "heuristics": {
+      "onset": {
+        "entropy_drop": 0.75,
+        "probe_frac": 0.8,
+        "cwcc_frac": 0.5
+      },
+      "lambda_js_target": 3.0
+    },
+    "run_combined_heuristic": false,
+    "diag_every_n": 10,
+    "baseline_checkpoint_every": 10,
+    "data_root": "./data",
+    "base_out": "./runs",
+    "num_workers": 0,
+    "do_robustness": false,
+    "do_ood": false,
+    "finetune": true,
+    "early_stopping": true,
+    "split_seed": 42,
+    "val_split": 0.2,
+    "finetune_cfg": {}
+  },
+  "data": {
+    "kind": "frozen",
+    "dataset": "amazon",
+    "encoder": "roberta",
+    "task": "multi_5"
+  }
+}

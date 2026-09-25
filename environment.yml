@@ -1,0 +1,26 @@
+name: nescal
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy>=2.0,<3.0
+  - scipy
+  - scikit-learn
+  - scikit-image
+  - pandas
+  - matplotlib
+  - seaborn
+  - tqdm
+  - pytz
+  - conda-forge::faiss-cpu
+  - conda-forge::umap-learn
+  - pip
+  - pip:
+      - transformers
+      - datasets
+      - relplot
+
+# NOTE: torch / torchvision are intentionally NOT pinned here.
+# CUDA versions differ across servers, so install these separately
+# per-machine after activating the env — see README.md "Environment setup".

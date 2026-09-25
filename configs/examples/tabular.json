@@ -1,0 +1,116 @@
+{
+  "format": 1,
+  "workflow": "standard",
+  "config": {
+    "dataset": "covertype",
+    "arch_name": "tabular_mlp",
+    "model_params": {
+      "arch": "tabular_mlp",
+      "num_classes": null,
+      "in_dim": null,
+      "hidden_dims": [
+        256,
+        256,
+        256
+      ],
+      "dropout": 0.1
+    },
+    "num_epochs": 100,
+    "batch_size": 512,
+    "num_bins": 15,
+    "lr": 0.001,
+    "momentum": 0.0,
+    "weight_decay": 1e-05,
+    "optimizer": "adamw",
+    "lr_schedule": "constant",
+    "candidate_layers": [
+      "final",
+      "stage_minus_1",
+      "stage_minus_2"
+    ],
+    "embedding_layer": "final",
+    "candidate_onsets": [
+      1,
+      5,
+      10,
+      20,
+      30,
+      50
+    ],
+    "selection_mode": "joint",
+    "nescal": {
+      "k": 10,
+      "mask_mode": "none",
+      "divergence_type": "js",
+      "weight_type": "topk",
+      "tau": 1.0
+    },
+    "lambda_ref": 5,
+    "lambda_grid_cosine": [
+      0.5,
+      1,
+      2,
+      5,
+      10
+    ],
+    "lambda_grid_constant": [
+      1,
+      2,
+      5
+    ],
+    "stage_b_seeds": [
+      18,
+      42
+    ],
+    "confirmatory_seeds": [
+      613,
+      2026
+    ],
+    "diag_every_n": 5,
+    "data_root": "./data",
+    "base_out": "./runs",
+    "num_workers": 4,
+    "baseline_checkpoint_every": 5,
+    "ablation_seeds": [
+      18,
+      42
+    ],
+    "ablations": {
+      "divergence": [
+        "js",
+        "fisher",
+        "l2",
+        "kl"
+      ],
+      "mask": [],
+      "k": [
+        2,
+        5,
+        20,
+        50
+      ],
+      "graph": [
+        "pca50",
+        "pca16",
+        "umap"
+      ]
+    },
+    "heuristic_seeds": [
+      18,
+      42
+    ],
+    "heuristics": {
+      "onset": {
+        "entropy_drop": 0.75,
+        "probe_frac": 0.8,
+        "cwcc_frac": 0.5
+      },
+      "lambda_js_target": 3.0
+    },
+    "run_combined_heuristic": true,
+    "wave5": false
+  },
+  "data": {
+    "kind": "tabular"
+  }
+}

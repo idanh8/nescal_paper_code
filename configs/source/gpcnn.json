@@ -1,0 +1,105 @@
+{
+  "dataset": "20ng",
+  "arch_name": "gpcnn",
+  "model_params": {
+    "arch": "gpcnn",
+    "num_classes": 20,
+    "vocab_size": null,
+    "embed_dim": 100,
+    "num_filters": 128,
+    "kernel_size": 5,
+    "dropout": 0.3,
+    "embedding_matrix_path": null,
+    "pad_idx": 0,
+    "freeze_embedding": true
+  },
+  "num_epochs": 50,
+  "batch_size": 128,
+  "num_bins": 15,
+  "lr": 0.001,
+  "momentum": 0.0,
+  "weight_decay": 0.0,
+  "optimizer": "adam",
+  "lr_schedule": "constant",
+  "candidate_layers": [
+    "final"
+  ],
+  "embedding_layer": "final",
+  "candidate_onsets": [
+    3,
+    5,
+    8,
+    12,
+    20
+  ],
+  "selection_mode": "joint",
+  "nescal": {
+    "k": 10,
+    "mask_mode": "none",
+    "divergence_type": "js",
+    "weight_type": "topk",
+    "tau": 1.0
+  },
+  "lambda_ref": 5,
+  "lambda_grid_cosine": [
+    0.5,
+    1,
+    2,
+    5
+  ],
+  "lambda_grid_constant": [
+    0.5,
+    1,
+    2,
+    5
+  ],
+  "stage_b_seeds": [
+    18,
+    42
+  ],
+  "confirmatory_seeds": [
+    613,
+    2026
+  ],
+  "diag_every_n": 5,
+  "data_root": "./data",
+  "base_out": "./runs",
+  "num_workers": 4,
+  "baseline_checkpoint_every": 1,
+  "ablation_seeds": [
+    18,
+    42
+  ],
+  "ablations": {
+    "divergence": [
+      "fisher",
+      "l2",
+      "kl"
+    ],
+    "mask": [],
+    "k": [
+      2,
+      5,
+      20,
+      50
+    ],
+    "graph": [
+      "pca50",
+      "pca16",
+      "umap"
+    ]
+  },
+  "heuristic_seeds": [
+    18,
+    42
+  ],
+  "heuristics": {
+    "onset": {
+      "entropy_drop": 0.75,
+      "probe_frac": 0.8,
+      "cwcc_frac": 0.5
+    },
+    "lambda_js_target": 3.0
+  },
+  "run_combined_heuristic": true
+}
