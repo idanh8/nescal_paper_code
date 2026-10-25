@@ -1,7 +1,20 @@
 # NeSCal
 
-Code for reproducing the NeSCal experiments from the paper *Neighborhood Smoothing for Calibration*. NeSCal regularizes predictive disagreement between neighbors in embedding space, using a cosine kNN graph fixed after warm-up.
+## Overview
 
+NeSCal is a training regularizer for neural network calibration. It encourages similar predictive distributions for neighbouring examples in embedding space, using a nearest-neighbour graph constructed after an initial training period.
+
+This repository accompanies *Neighborhood Smoothing for Calibration* by Idan Horowitz and Avigdor Gal.
+
+[Read the paper](https://arxiv.org/abs/2610.09020)
+
+## Main findings
+
+- Evaluated across 11 image, text, and tabular dataset–architecture settings.
+- Lower test negative log-likelihood than cross-entropy training in all 11 main settings.
+- After temperature scaling, achieved the lowest negative log-likelihood among evaluated training methods in seven of eight image/tabular settings.
+- Introduces no additional inference-time computation.
+  
 ## Setup
 
 ```bash
