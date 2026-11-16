@@ -52,7 +52,7 @@ def _load_amazon(task, data_root, seed, max_per_class, test_frac):
             fp = hf_hub_download('McAuley-Lab/Amazon-Reviews-2023',
                                  f'raw/review_categories/{cat_name}.jsonl', repo_type='dataset')
         except Exception as e:
-            print(f'[amazon] {cat_name}.jsonl unavailable ({type(e).__name__}: {e}) — skipping', flush=True)
+            print(f'[amazon] {cat_name}.jsonl unavailable ({type(e).__name__}: {e}) - skipping', flush=True)
             continue
         got = 0
         with open(fp, 'r', encoding='utf-8') as f:

@@ -18,7 +18,6 @@ def data_kind(cfg):
 
 
 def read_recipe(path):
-    """Read caller-authored experiment settings, never infer winners from result files."""
     raw = json.loads(Path(path).read_text())
     if any(key in raw for key in ('reportable', 'runs', 'winners', 'best_onset', 'timestamp')):
         raise ValueError('Supply an experiment configuration, not a run manifest.')
@@ -37,7 +36,6 @@ def read_recipe(path):
 
 
 def override(recipe, expression):
-    """Explicit JSON-valued overrides; never evaluate Python from a recipe."""
     key, sep, value = expression.partition('=')
     if not sep:
         raise ValueError('--set expects dotted.path=JSON_VALUE')
@@ -132,7 +130,6 @@ def competitor_policy(recipe, mode):
 
 
 def bind_data(recipe, cfg, run_root=None, extract=False):
-    """Same builders, arguments and split conventions used by the source experiments."""
     kind = recipe['data']['kind']
     data = recipe['data']
     cfg = deepcopy(cfg)

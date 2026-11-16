@@ -126,7 +126,7 @@ def run_headline(cfg, ts, include_followups=True):
     try:
         run_competitors.run(ts, cfg=cfg_comp, reuse_baseline_ts=None)
     except Exception as e:
-        print(f'  !! competitors errored ({type(e).__name__}: {e}) — continuing.', flush=True)
+        print(f'  !! competitors errored ({type(e).__name__}: {e}) - continuing.', flush=True)
 
     abl = {'reportable': {}, 'diverged': [], 'errored': []}
     for dvg in cfg['ablations']['divergence']:
@@ -171,7 +171,7 @@ def compute_eta_report(cfg, run_root, sidecar_dir):
             else np.log(np.clip(probs, 1e-12, 1))
         PI_te, region = _split_eta(_sidecar(sidecar_dir, seed), 'test')
         if PI_te.shape[0] != probs.shape[0]:
-            print(f'  !! seed {seed}: eta/test length mismatch — skipping', flush=True); continue
+            print(f'  !! seed {seed}: eta/test length mismatch - skipping', flush=True); continue
         m = all_eta_metrics(probs, logits, PI_te, region_mask=region, run_oracle=True)
         m['nescal_minus_oracle_mse'] = m['mse_to_eta'] - m['oracle_mse_to_eta']
         rows[seed] = m
@@ -270,7 +270,7 @@ def figure_activation_criterion(cfg, ts, best_onset, best_lam):
             label=f'figB_ncl H={H}', epochs_to_train=cfg['num_epochs'],
             run_kwargs=_mlp_base_kwargs(cfg, loaders, seed, root_ns, **extra))
         if div_xe or div_ns:
-            print(f'  H={H}: diverged (xe={div_xe}, ncl={div_ns}) — skipping', flush=True); continue
+            print(f'  H={H}: diverged (xe={div_xe}, ncl={div_ns}) - skipping', flush=True); continue
 
         def _pl(rp):
             td = load_pkl(os.path.join(rp, 'test_data.pkl'))

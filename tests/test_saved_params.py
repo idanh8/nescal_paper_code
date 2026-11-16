@@ -1,4 +1,3 @@
-"""Exercise saved-parameter loading without importing the optional training runtime."""
 import ast
 from pathlib import Path
 import unittest

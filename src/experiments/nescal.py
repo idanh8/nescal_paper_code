@@ -168,7 +168,7 @@ def run(cfg=CONFIG, ts=None, schedules=None):
         print(f'  -> joint winner: onset E*={best_onset}, λ_cosine={lam_cos}', flush=True)
         if best_onset == max(onsets) or lam_cos == max(cfg['lambda_grid_cosine']):
             print(f'  !! WARNING: joint winner is on a GRID EDGE (onset max={max(onsets)}, '
-                  f'λ max={max(cfg["lambda_grid_cosine"])}) — widen the grid before trusting this.', flush=True)
+                  f'λ max={max(cfg["lambda_grid_cosine"])}) - widen the grid before trusting this.', flush=True)
         const_scores = {}
         for seed in sb_seeds:
             for lam in cfg['lambda_grid_constant']:
@@ -187,7 +187,7 @@ def run(cfg=CONFIG, ts=None, schedules=None):
         print(f'  -> selected onset E* = {best_onset}  (mean val NLL: '
               f'{ {e: round(v, 4) for e, v in onset_table.items()} })', flush=True)
         if best_onset == max(onsets):
-            print(f'  !! WARNING: selected onset is the GRID MAX ({max(onsets)}) — widen candidate_onsets.', flush=True)
+            print(f'  !! WARNING: selected onset is the GRID MAX ({max(onsets)}) - widen candidate_onsets.', flush=True)
         cos_scores, const_scores = {}, {}
         for seed in sb_seeds:
             for lam in cfg['lambda_grid_cosine']:

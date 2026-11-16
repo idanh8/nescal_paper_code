@@ -2,7 +2,7 @@
 name = "nescal"
 version = "0.1.0"
 requires-python = ">=3.10"
-description = "Calibration via Embedding-Neighborhood Predictive Smoothing (NESCAL)"
+description = "Neighborhood Smoothing for Calibration (NeSCal)"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

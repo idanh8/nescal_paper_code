@@ -226,8 +226,7 @@ class Trainer:
         return getattr(inner, 'active', True)
 
     def activate_secondary_loss(self, embedding_loader, candidate_layers, embedding_layer):
-        """No-op for secondary losses that don't declare requires_activation.
-        Kept full-precision — see module docstring."""
+        """No-op for secondary losses that don't declare requires_activation."""
         inner = self._inner_secondary
         if inner is None or not getattr(inner, 'requires_activation', False):
             return None
@@ -452,7 +451,7 @@ class Trainer:
     def load_model(path):
         """Reconstructs a Trainer exactly as trained (same
         optimizer/scheduler config, not just the same weights) and restores
-        its saved test-set predictions. New — see module docstring."""
+        its saved test-set predictions."""
         with open(os.path.join(path, 'model_params.pkl'), 'rb') as f:
             ctor_kwargs = pickle.load(f)
         with open(os.path.join(path, 'test_data.pkl'), 'rb') as f:
@@ -662,7 +661,7 @@ def train_model(train_loader, val_loader, test_loader, embedding_loader, label_l
             if first_nonfinite_epoch is None:
                 first_nonfinite_epoch = epoch
             nonfinite_streak += 1
-            print(f'  [epoch {epoch + 1}] NON-FINITE val loss ({val_loss}) — '
+            print(f'  [epoch {epoch + 1}] NON-FINITE val loss ({val_loss}) - '
                   f'{nonfinite_streak}/{divergence_patience} consecutive')
             if nonfinite_streak >= divergence_patience:
                 raise DivergedRun(first_nonfinite_epoch, val_loss, nonfinite_streak)

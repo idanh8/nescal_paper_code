@@ -10,7 +10,7 @@ def _base(dataset, encoder, base_dir=None):
     folder = base_dir or os.path.join(FROZEN_ROOT, f'{dataset}_{encoder}')
     fp = os.path.join(folder, 'base.pt')
     if not os.path.exists(fp):
-        raise FileNotFoundError(f'{fp} missing — run embedding extraction first')
+        raise FileNotFoundError(f'{fp} missing - run embedding extraction first')
     return torch.load(fp, map_location='cpu')
 
 
@@ -52,7 +52,7 @@ def load_frozen_corruption(dataset, encoder, corruption, severity, batch_size=25
     folder = base_dir or os.path.join(FROZEN_ROOT, f'{dataset}_{encoder}')
     fp = os.path.join(folder, 'corruptions', f'{corruption}_{severity}.pt')
     if not os.path.exists(fp):
-        raise FileNotFoundError(f'{fp} missing — extract with --robustness')
+        raise FileNotFoundError(f'{fp} missing - extract with --robustness')
     d = torch.load(fp)
     ds = TensorDataset(d['emb'].float(), d['lab'].long())
     return DataLoader(IndexedImageDataset(ds), batch_size=batch_size, shuffle=False,
@@ -63,7 +63,7 @@ def load_frozen_ood(dataset, encoder, batch_size=256, num_workers=0, base_dir=No
     folder = base_dir or os.path.join(FROZEN_ROOT, f'{dataset}_{encoder}')
     fp = os.path.join(folder, 'svhn_ood.pt')
     if not os.path.exists(fp):
-        raise FileNotFoundError(f'{fp} missing — extract with --robustness')
+        raise FileNotFoundError(f'{fp} missing - extract with --robustness')
     d = torch.load(fp)
     ds = TensorDataset(d['emb'].float(), d['lab'].long())
     return DataLoader(IndexedImageDataset(ds), batch_size=batch_size, shuffle=False,

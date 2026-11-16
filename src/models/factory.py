@@ -20,7 +20,7 @@ def _package_generic(logits, stage_maps, pooled_final, return_embeddings, embedd
     return logits, embeddings
 
 
-# CIFAR ResNet (He et al. 2016) — the 6n+2 family: ResNet-20/32/44/56/110.
+# CIFAR ResNet (He et al. 2016), the 6n+2 family: ResNet-20/32/44/56/110.
 
 class CifarBasicBlock(nn.Module):
     def __init__(self, in_planes, planes, stride=1):

@@ -41,7 +41,7 @@ def _ensure_corruption_set(folder, data_root):
     os.makedirs(data_root, exist_ok=True)
     tar_path = os.path.join(data_root, f'{folder}.tar')
     try:
-        print(f'[data] {folder} missing — downloading {url} (large, may take a while)…', flush=True)
+        print(f'[data] {folder} missing - downloading {url} (large, may take a while)', flush=True)
         urllib.request.urlretrieve(url, tar_path)
         with tarfile.open(tar_path) as t:
             t.extractall(data_root)
@@ -54,7 +54,7 @@ def _ensure_corruption_set(folder, data_root):
         print(f'[data] {folder} ready.' if ok else f'[data] {folder} extracted but probe {probe} missing.', flush=True)
         return ok
     except Exception as e:
-        print(f'[data] failed to fetch {folder} ({type(e).__name__}: {e}) — corruption will be skipped.', flush=True)
+        print(f'[data] failed to fetch {folder} ({type(e).__name__}: {e}) - corruption will be skipped.', flush=True)
         if os.path.exists(tar_path):
             try: os.remove(tar_path)
             except OSError: pass
@@ -252,10 +252,10 @@ def _ensure_tinyimagenet(data_root):
     if os.path.isdir(os.path.join(root, 'train')) and os.path.isdir(os.path.join(root, 'val')):
         return root
     os.makedirs(data_root, exist_ok=True)
-    print(f'Tiny-ImageNet not found at {root} — downloading (~240MB)...')
+    print(f'Tiny-ImageNet not found at {root} - downloading (~240MB)...')
     download_and_extract_archive(TINYIMAGENET_URL, download_root=data_root, remove_finished=False)
     if not os.path.isdir(os.path.join(root, 'train')):
-        raise RuntimeError(f'Download completed but {root}/train is missing — unexpected archive layout.')
+        raise RuntimeError(f'Download completed but {root}/train is missing - unexpected archive layout.')
     print(f'Tiny-ImageNet ready at {root}')
     return root
 

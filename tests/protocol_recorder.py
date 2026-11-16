@@ -1,4 +1,3 @@
-"""Exercise orchestration with recorded training calls and deterministic validation scores."""
 import ast
 from copy import deepcopy
 import contextlib
@@ -66,7 +65,6 @@ def record_suite(src, case):
     env['run_nescal']=rn
     spec_env={};exec((src/'configs/method_specs.py').read_text(),spec_env)
     specs=spec_env['method_specs'];fl=spec_env['fl_primary_spec']
-    # Small grids, retaining candidate-set, sequential and fixed-per-dataset policies.
     for sp in specs.values():
         for key in ('search_space','fallback_search_space'):
             if key in sp:sp[key]={k:v[:2] for k,v in sp[key].items()}
@@ -114,5 +112,4 @@ def record_suite(src, case):
             syn=load_functions(path('synthetic'),dict(env))
             if case=='synthetic':syn.run_headline(cfg,'test')
             else:syn.run_headline(cfg,'test',include_followups=False)
-    # Exclude temporary root creation: it contains no training or metric data.
     return {'calls':calls,'manifests':manifests}

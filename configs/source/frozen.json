@@ -102,10 +102,8 @@
       "entropy_drop": 0.75,
       "probe_frac": 0.8,
       "cwcc_frac": 0.5
-    },
-    "lambda_js_target": 3.0
+    }
   },
-  "run_combined_heuristic": false,
   "diag_every_n": 10,
   "baseline_checkpoint_every": 10,
   "data_root": "./data",

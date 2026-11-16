@@ -10,9 +10,6 @@ from sklearn.preprocessing import StandardScaler
 
 
 def brier_score(probs: np.ndarray, labels: np.ndarray) -> float:
-    """
-    Multi-class Brier score:\
-    """
     N, C = probs.shape
     one_hot = np.eye(C)[labels]
     return np.mean(np.sum((probs - one_hot) ** 2, axis=1))

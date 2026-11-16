@@ -41,7 +41,7 @@ def run(run_root, cfg=run_nescal.CONFIG, manifest_name='ablations_manifest.json'
                 manifest['reportable'].setdefault(label, {})[seed] = rp
                 if div: manifest['diverged'].append({'arm': label, 'seed': seed})
             except Exception as e:
-                print(f'  !! {label} seed={seed} ERRORED ({type(e).__name__}: {e}) — skipping, continuing.', flush=True)
+                print(f'  !! {label} seed={seed} ERRORED ({type(e).__name__}: {e}) - skipping, continuing.', flush=True)
                 manifest['errored'].append({'arm': label, 'seed': seed, 'error': f'{type(e).__name__}: {e}'})
             write_manifest(os.path.join(run_root, manifest_name), manifest)
 

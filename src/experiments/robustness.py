@@ -21,7 +21,7 @@ def run(run_root, dataset, do_corruption=True, do_ood=True, data_root='./data', 
         probe = os.path.join(data_root, folder or '', 'gaussian_noise.npy' if dataset != 'tinyimagenet'
                              else os.path.join('gaussian_noise', '1'))
         if not folder or not os.path.exists(probe):
-            print(f'[extras] corruption data not found ({probe}) — SKIPPING corruption. '
+            print(f'[extras] corruption data not found ({probe}) - SKIPPING corruption. '
                   f'Download {folder} into {data_root}/ and re-run extras to add it.', flush=True)
             do_corruption = False
     runs = _reportable_runs(run_root)
@@ -45,12 +45,12 @@ def run(run_root, dataset, do_corruption=True, do_ood=True, data_root='./data', 
                                                 num_bins, data_root=data_root, batch_size=batch_size)
                     with open(os.path.join(rp, 'corruption_results.pkl'), 'wb') as f: pickle.dump(corr, f)
                 except Exception as e:
-                    print(f'  !! corruption {label} seed={seed} failed ({type(e).__name__}: {e}) — skipping.', flush=True)
+                    print(f'  !! corruption {label} seed={seed} failed ({type(e).__name__}: {e}) - skipping.', flush=True)
             if _do and dataset in ('cifar10', 'cifar100', 'tinyimagenet'):
                 try:
                     ood = evaluate_ood_separation(m, dataset, data_root=data_root, batch_size=batch_size, size=ood_size)
                     with open(os.path.join(rp, 'ood_results.pkl'), 'wb') as f: pickle.dump(ood, f)
                 except Exception as e:
-                    print(f'  !! ood {label} seed={seed} failed ({type(e).__name__}: {e}) — skipping.', flush=True)
+                    print(f'  !! ood {label} seed={seed} failed ({type(e).__name__}: {e}) - skipping.', flush=True)
             print(f'[{done}/{total}] {label} seed={seed} done', flush=True)
     print('=== Extras complete ===', flush=True)

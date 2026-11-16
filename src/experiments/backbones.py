@@ -575,7 +575,7 @@ def preflight(stages, jobs):
         for j in jobs:
             b = HEAD_JOBS[j]['base']
             if not os.path.exists(b):
-                problems.append(f'{j}: {b} missing; extract it first, see the docstring, or drop it with --jobs')
+                problems.append(f'{j}: {b} missing; extract it first with python -m encoders.extract_embeddings, or drop it with --jobs')
             else:
                 print(f'[preflight] {j}: {b} {os.path.getsize(b) / 1e9:.1f} GB', flush=True)
         import importlib.util

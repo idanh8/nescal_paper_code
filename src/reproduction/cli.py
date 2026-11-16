@@ -1,4 +1,3 @@
-"""Simple launchers around the experiment cores used in the research repository."""
 import argparse
 from copy import deepcopy
 from datetime import datetime

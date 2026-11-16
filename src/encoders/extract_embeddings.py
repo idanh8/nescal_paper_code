@@ -77,7 +77,7 @@ def _imagenet_raw(resize_px, data_root='./data'):
     from datasets import load_dataset as hf_load
     imagenet_path = os.path.join(data_root, 'imagenet-1k')
     if not os.path.isdir(imagenet_path):
-        raise FileNotFoundError(f'{imagenet_path} not found — download with: '
+        raise FileNotFoundError(f'{imagenet_path} not found - download with: '
                                 'huggingface-cli download ILSVRC/imagenet-1k --repo-type dataset '
                                 f'--local-dir {imagenet_path}')
     ds = hf_load('parquet', data_dir=os.path.join(imagenet_path, 'data'))
@@ -191,7 +191,7 @@ def run(dataset, encoder, data_root='./data', robustness=False, batch_size=256, 
     os.makedirs(out_dir, exist_ok=True)
     base_fp = os.path.join(out_dir, 'base.pt')
     if os.path.exists(base_fp):
-        print(f'[extract] base.pt exists at {out_dir} — skipping base extraction', flush=True)
+        print(f'[extract] base.pt exists at {out_dir} - skipping base extraction', flush=True)
     else:
         is_text = encoder in ('roberta', 'bert')
         payload = extract_text(dataset, encoder, data_root, task=task) if is_text \

@@ -54,7 +54,7 @@ python scripts/train_competitors.py --config configs/examples/image.json \
 
 These values illustrate the interface. Use `--lambda-constant VALUE` for constant regularization; synthetic NeSCal uses this option only. Competitor parameters and search ranges are defined in `src/configs/method_specs.py`.
 
-## Basic options examples
+## Common options
 
 - `--dry-run`: inspect settings without training or downloading data.
 - `--search-seeds 18 42 --confirmatory-seeds 613 2026`: set sweep and confirmation seeds.
@@ -84,5 +84,25 @@ python scripts/additional_tables.py --run-root runs/cifar100/resnet50/full runs/
 ```
 
 `run_ncr.py` trains NCR under the NeSCal protocol on the coarse grid reported in the paper (`--grid full` adds the remaining cells). `run_additional.py` covers the per-setting analysis, the target and graph factorial, the alternative divergences, the scale and cache arms, and Mixup and RankMixup. `run_backbones.py` covers the frozen pre-trained backbones, ViT-B/16 fine-tuning and the cache benchmark. `additional_tables.py` prints the tables from their outputs.
+
+The frozen-backbone heads read features extracted once with `python -m encoders.extract_embeddings --dataset imagenet --encoder dinov2` and `--dataset cifar100 --encoder vit_b16`.
+
+## Paper results
+
+| Result | Command |
+|---|---|
+| Main comparison, Brier score and accuracy, secondary calibration metrics, refinement, post-hoc composition, constant vs cosine schedule, training cost | `reproduce.py` for each configuration, then `make_tables.py` |
+| CIFAR-100 onset check against a cosine learning rate | `reproduce.py --stages headline-selection` |
+| Corruption robustness and SVHN detection | `evaluate_corruptions.py`, `evaluate_ood.py` |
+| Graph controls and ablations | `run_random_graph.py`, `run_ablations.py` |
+| Activation rules | `reproduce.py --stages heuristics` |
+| Class imbalance and label noise | `run_perturbations.py` |
+| Failure prediction and selection criterion | `analyze_results.py` |
+| Across-setting Wilcoxon tests (from the reported setting means) | `paper_wilcoxon.py` |
+| Theory diagnostics, and edge JS and edge agreement from activation onwards | `run_theory.py --kind real` |
+| Synthetic study | `run_synthetic.py`, `run_theory.py --kind synthetic` |
+| NCR | `run_ncr.py`, `additional_tables.py` |
+| Label-fixed comparison, factorial, divergences, approximate graphs, graph rebuilding, target staleness, Mixup, RankMixup, paired comparisons | `run_additional.py`, `additional_tables.py` |
+| Pre-trained backbones, ViT-B/16 fine-tuning, cost, memory and cache synchronization | `run_backbones.py`, `additional_tables.py` |
 
 Experiment implementations are in `src/`; `scripts/` provides the launch commands. Optional orchestration checks run with `python -m unittest discover -s tests -v`; these do not run real training or verify the paper's numerical results.

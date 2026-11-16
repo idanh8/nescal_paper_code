@@ -7,8 +7,7 @@ import torch.nn.functional as F
 def js_divergence_torch(p: torch.Tensor, q: torch.Tensor, epsilon: float = 1e-10) -> torch.Tensor:
     """
     Batched Jensen-Shannon divergence between rows of p and q, in bits
-    (log base 2) so the result is bounded in [0, 1] .
-    Moved here from spatial_metrics.py (now deleted) since this was the only
+    (log base 2) so the result is bounded in [0, 1].
     """
     p = torch.clamp(p, epsilon, 1.0)
     p = p / p.sum(dim=1, keepdim=True)
@@ -94,7 +93,7 @@ class PreNeighborhoodConsistencyLoss(nn.Module):
         return torch.tensor(red, dtype=features.dtype, device=features.device)
 
     def precompute_matrices(self, features, chunk_size=512):
-        assert self.k is not None, "k must be set for PreNCL — full matrix is infeasible at scale"
+        assert self.k is not None, "k must be set for PreNCL - full matrix is infeasible at scale"
 
         if self.graph_reducer is not None:
             features = self._reduce_graph_features(features)

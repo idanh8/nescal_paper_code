@@ -25,12 +25,6 @@ def make_lambda_schedule(kind, lam_peak, onset, E, off_frac=0.5, decay='cosine')
 
 
 def set_seed(seed=42):
-    """
-    Set random seeds for reproducibility across all libraries
-
-    Args:
-        seed: Random seed value (default: 42)
-    """
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)

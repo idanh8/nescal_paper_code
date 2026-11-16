@@ -44,7 +44,7 @@ def holm_bonferroni(pvals, alpha=0.05):
     return out
 
 def _fmt(vals):
-    a = np.array(vals, float); return f'{a.mean():.4f}±{a.std():.4f}' if len(a) else '—'
+    a = np.array(vals, float); return f'{a.mean():.4f}±{a.std():.4f}' if len(a) else '-'
 
 def _table(title, rows, headers):
     print(f'\n### {title}\n'); print('| ' + ' | '.join(headers) + ' |')
@@ -104,8 +104,8 @@ def assemble_report(run_root):
             if meth == ref or meth not in ps: continue
             md, _ = _paired_p(ps[ref], ps[meth])
             p, rej, thr = holm[meth]
-            srows.append([meth, f'{md:+.4f}', f'{p:.3f}' if p == p else '—', '✓' if rej else '✗'])
-        _table(f'Significance vs {ref} — test {mk.upper()} (paired t + Holm, N seeds)',
+            srows.append([meth, f'{md:+.4f}', f'{p:.3f}' if p == p else '-', 'yes' if rej else 'no'])
+        _table(f'Significance vs {ref}: test {mk.upper()} (paired t + Holm, N seeds)',
                srows, ['method', 'Δmean', 'p', 'sig@0.05'])
         _write_csv(os.path.join(csv_dir, f'significance_{mk}.csv'), ['method', 'delta_mean', 'p', 'sig@0.05'], srows)
 
@@ -132,7 +132,7 @@ def assemble_report(run_root):
                 rows.append([meth] + [_fmt([v for v in arms.get(a, []) if v is not None])
                                       for a in ('base', 'ts', 'local', 'dc', 'dac', 'lore')])
         if rows:
-            _table(f'Post-hoc suite — test {arm_metric}', rows,
+            _table(f'Post-hoc suite: test {arm_metric}', rows,
                    ['method', 'base', 'TS', 'LoCal', 'Dirichlet', 'DAC', 'LoRe'])
             _write_csv(os.path.join(csv_dir, f'posthoc_{arm_metric}.csv'),
                        ['method', 'base', 'TS', 'LoCal', 'Dirichlet', 'DAC', 'LoRe'], rows)
@@ -145,7 +145,7 @@ def assemble_report(run_root):
         return f
     crows = [[mk] + [_fmt(list(_collect(run_root, 'corruption_results.pkl', corr_mean(mk)).get(m, [])))
                      for m in methods] for mk in ('ece', 'nll', 'accuracy')]
-    if any(r[1:] != ['—'] * len(methods) for r in crows):
+    if any(r[1:] != ['-'] * len(methods) for r in crows):
         _table('CIFAR-C (mean over corruptions×severities)', crows, ['metric'] + methods)
         _write_csv(os.path.join(csv_dir, 'corruption.csv'), ['metric'] + methods, crows)
 
@@ -153,7 +153,7 @@ def assemble_report(run_root):
     orows = []
     for mk, path in (('auroc', lambda o: o['msp']['auroc']), ('fpr_at_95_tpr', lambda o: o['msp']['fpr_at_95_tpr'])):
         orows.append([mk] + [_fmt(list(_collect(run_root, 'ood_results.pkl', path).get(m, []))) for m in methods])
-    if any(r[1:] != ['—'] * len(methods) for r in orows):
+    if any(r[1:] != ['-'] * len(methods) for r in orows):
         _table('SVHN OOD separation (MSP)', orows, ['metric'] + methods)
         _write_csv(os.path.join(csv_dir, 'ood.csv'), ['metric'] + methods, orows)
 
@@ -197,15 +197,9 @@ def assemble_report(run_root):
             vals = [load_pkl(os.path.join(rp, 'test_results.pkl')).get('nll')
                     for rp in per.values() if os.path.exists(os.path.join(rp, 'test_results.pkl'))]
             vals = [v for v in vals if v is not None]
-            rows.append([label, _fmt(vals), f'{np.mean(vals) - grid_nll:+.4f}' if vals else '—'])
+            rows.append([label, _fmt(vals), f'{np.mean(vals) - grid_nll:+.4f}' if vals else '-'])
         rows = [['grid winner (E*,λ*)', f'{grid_nll:.4f}', '0.0000']] + rows
-        realized = [load_pkl(os.path.join(rp, 'train_time_diagnostics.pkl'))['theory'].get('lambda_star')
-                    for rp in hm['reportable'].get('hreg_lambda', {}).values()
-                    if os.path.exists(os.path.join(rp, 'train_time_diagnostics.pkl'))]
-        realized = [r for r in realized if r is not None]
-        lam_h_str = _fmt(realized) if realized else 'n/a'
-        _table(f'Heuristic-regret (test NLL; grid E*={hm["best_onset"]}, λ*={hm["lambda"]}, '
-               f'js_target={hm["js_target"]}, realized λ_h={lam_h_str})',
+        _table(f'Heuristic-regret (test NLL; grid E*={hm["best_onset"]}, λ*={hm["lambda"]})',
                rows, ['config', 'test_nll', 'Δ vs grid'])
         _write_csv(os.path.join(csv_dir, 'heuristic_regret.csv'), ['config', 'test_nll', 'delta_vs_grid'], rows)
 
@@ -231,8 +225,8 @@ def assemble_report(run_root):
         return float(np.mean(h)) if h else None
     kf = list(_collect(run_root, 'train_time_diagnostics.pkl', keepfrac).get('ncl_FINAL_cosine', []))
     if kf:
-        _table('Boundary masking (NeSCal, mean same-argmax edge fraction retained)',
-               [['ncl_FINAL_cosine', _fmt(kf)]], ['method', 'keep_fraction'])
+        _table('Edge agreement (NeSCal, share of edges whose endpoints have the same predicted label, mean over logged epochs)',
+               [['ncl_FINAL_cosine', _fmt(kf)]], ['method', 'edge_agreement'])
 
 
     def th(path):
@@ -251,7 +245,7 @@ def assemble_report(run_root):
         mj = np.mean([x['mean_edge_js'] for x in d if x.get('mean_edge_js')])
         ls = np.mean([x['lambda_star'] for x in d if x.get('lambda_star')])
         _table('Theory (NeSCal cosine)', [[k, v] for k, v in agg.items()]
-               + [['lambda_star × mean_edge_js', f'{ls * mj:.2f}  (compare ≈27)']], ['quantity', 'value'])
+               + [['lambda_star × mean_edge_js', f'{ls * mj:.2f}']], ['quantity', 'value'])
 
 
     w5_mf = os.path.join(run_root, 'wave5_fisherfix_manifest.json')
@@ -262,7 +256,7 @@ def assemble_report(run_root):
                     for rp in rep[label].values() if os.path.exists(os.path.join(rp, 'test_results.pkl'))]
         rows = [[l] + [_fmt([v for v in w5c(l, mk) if v is not None])
                        for mk in ('nll', 'ece', 'avg_cw_ece', 'accuracy')] for l in sorted(rep)]
-        _table('Wave 5 — perturbation robustness (test; avg_cw_ece is the Fisher-test signal)',
+        _table('Perturbation robustness (test)',
                rows, ['config', 'nll', 'ece', 'avg_cw_ece', 'accuracy'])
         _write_csv(os.path.join(csv_dir, 'wave5_robustness.csv'),
                    ['config', 'nll', 'ece', 'avg_cw_ece', 'accuracy'], rows)
@@ -294,7 +288,7 @@ def assemble_report(run_root):
                     for k in vals: vals[k].append(ht(o, k))
             rows.append([l] + [_fmt([v for v in vals[k] if v == v]) for k in ('head_acc', 'tail_acc', 'head_ece', 'tail_ece')])
         if rows:
-            _table('Fisher test — head vs tail (tail = least-frequent third; compare ncl_fisher vs ncl_uniform on tail_ece)',
+            _table('Fisher test: head vs tail (tail = least-frequent third; compare ncl_fisher vs ncl_uniform on tail_ece)',
                    rows, ['config', 'head_acc', 'tail_acc', 'head_ece', 'tail_ece'])
             _write_csv(os.path.join(csv_dir, 'fisher_head_tail.csv'),
                        ['config', 'head_acc', 'tail_acc', 'head_ece', 'tail_ece'], rows)
@@ -304,7 +298,7 @@ def assemble_report(run_root):
     rrows = [[m, _fmt(list(_collect(run_root, 'posthoc_results.pkl', _ref('brier_toplabel_cal')).get(m, []))),
                  _fmt(list(_collect(run_root, 'posthoc_results.pkl', _ref('brier_toplabel_ref')).get(m, [])))]
              for m in methods]
-    if any(r[1] != '—' for r in rrows):
+    if any(r[1] != '-' for r in rrows):
         _table('Refinement decomposition (top-label Brier = calibration + refinement)',
                rrows, ['method', 'brier_cal', 'brier_ref'])
         _write_csv(os.path.join(csv_dir, 'refinement.csv'), ['method', 'brier_cal', 'brier_ref'], rrows)

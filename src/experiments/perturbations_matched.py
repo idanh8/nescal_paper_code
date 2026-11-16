@@ -123,7 +123,7 @@ def build_report():
                 for rp in rep[label].values() if os.path.exists(os.path.join(rp, 'test_results.pkl'))]
     rows = [[l] + [_fmt([v for v in w5c(l, mk) if v is not None])
                    for mk in ('nll', 'ece', 'avg_cw_ece', 'accuracy')] for l in sorted(rep)]
-    _table('Wave 5 — perturbation robustness (test; avg_cw_ece is the Fisher-test signal)',
+    _table('Perturbation robustness (test)',
            rows, ['config', 'nll', 'ece', 'avg_cw_ece', 'accuracy'])
     _write_csv(os.path.join(csv_dir, 'wave5_fisherfix_robustness.csv'),
                ['config', 'nll', 'ece', 'avg_cw_ece', 'accuracy'], rows)
@@ -157,7 +157,7 @@ def build_report():
         rows.append([l] + [_fmt([v for v in vals[k] if v == v])
                            for k in ('head_acc', 'tail_acc', 'head_ece', 'tail_ece')])
     if rows:
-        _table('Fisher test — head vs tail (tail = least-frequent third; compare ncl_fisher vs ncl_uniform on tail_ece)',
+        _table('Fisher test: head vs tail (tail = least-frequent third; compare ncl_fisher vs ncl_uniform on tail_ece)',
                rows, ['config', 'head_acc', 'tail_acc', 'head_ece', 'tail_ece'])
         _write_csv(os.path.join(csv_dir, 'wave5_fisherfix_head_tail.csv'),
                    ['config', 'head_acc', 'tail_acc', 'head_ece', 'tail_ece'], rows)

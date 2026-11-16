@@ -29,7 +29,7 @@ def train_one(tracker, *, label, epochs_to_train, run_kwargs):
         _, val_results, test_results, _ = train_model(**run_kwargs)
     except DivergedRun as e:
         elapsed = time.time() - t
-        print(f'  !! DIVERGED at epoch {e.first_epoch + 1} — voiding {label}, continuing.', flush=True)
+        print(f'  !! DIVERGED at epoch {e.first_epoch + 1} - voiding {label}, continuing.', flush=True)
         tracker.record(min(epochs_to_train, getattr(e, 'first_epoch', epochs_to_train)), elapsed)
         return None, None, True, run_kwargs['root_path']
     tracker.record(epochs_to_train, time.time() - t)

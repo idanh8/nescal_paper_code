@@ -341,7 +341,7 @@ class DirichletCalibrator(BasePostHocCalibrator):
                 'W': self.W.cpu().numpy(), 'b': self.b.cpu().numpy()}
 
 class LoReCalibrator(BasePostHocCalibrator):
-    """LoRe — local recalibration (Luo et al., UAI 2022, Eq. 6). 
+    """LoRe: local recalibration (Luo et al., UAI 2022, Eq. 6).
         Based on the Barbera et al. LoCal Nets implementation of LCE  
     """
     name = 'lore'
@@ -443,7 +443,7 @@ class DACCalibrator(BasePostHocCalibrator):
     def _knn_score(self, query):
         q = np.ascontiguousarray(self._norm(query))
         D, _ = self._index.search(q, self.knn_k)
-        return D[:, -1]                              # kth-NN distance — authors' avg_top_k=False default
+        return D[:, -1]                              # kth-NN distance; authors' avg_top_k=False default
 
     def _temperature(self, w, s):
         return np.clip(w[0] * s + w[-1], 1e-20, None)

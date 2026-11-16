@@ -55,7 +55,7 @@ def run(ts, cfg=None, reuse_baseline_ts=None, specs=None, fl_spec=None):
                                                    loss_params=lp, activation_params=None, log_graph_maturity=False))
             v = None if div else val['nll']
         except Exception as e:
-            print(f'  !! {name} {cand} seed={seed} ERRORED ({type(e).__name__}: {e}) — skipping.', flush=True)
+            print(f'  !! {name} {cand} seed={seed} ERRORED ({type(e).__name__}: {e}) - skipping.', flush=True)
             manifest['errored'].append({'method': name, 'cand': cand, 'seed': seed, 'error': f'{type(e).__name__}: {e}'})
             v, rp = None, root
         cache[key] = (v, rp)
