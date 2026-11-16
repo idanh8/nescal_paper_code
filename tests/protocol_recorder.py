@@ -3,11 +3,9 @@ import ast
 from copy import deepcopy
 import contextlib
 import io
-import json
 import os
 from pathlib import Path
 import types
-import tempfile
 import numpy as np
 
 
@@ -30,7 +28,7 @@ def record_suite(src, case):
     src=Path(src)
     legacy=(src/'runners').exists()
     paths={'nescal':'run_nescal','competitors':'run_competitors','synthetic':'run_synthetic',
-           'ablations':'run_ablations','perturbations':'run_wave5','perturbations_matched':'run_wave5_full'}
+           'ablations':'run_ablations','perturbations_matched':'run_wave5_full'}
     def path(name):
         return src/('runners' if legacy else 'experiments')/(paths[name]+'.py' if legacy else name+'.py')
     calls=[];manifests={}
@@ -98,18 +96,13 @@ def record_suite(src, case):
         elif case=='competitors_fixed':
             cfg['dataset']='cifar10'
             comp.run('test',cfg,reuse_baseline_ts='test')
-        elif case in ('ablations','perturbations','perturbations_matched'):
+        elif case in ('ablations','perturbations_matched'):
             manifests[root+'/run_manifest.json']={'best_onset':3,'lambda_cosine':2}
             if case=='ablations':
                 load_functions(path(case),dict(env)).run(root,cfg)
-            elif case=='perturbations':
-                w={'longtail_factors':[10], 'longtail_arms':{'js':{'divergence_type':'js'},'fisher':{'divergence_type':'fisher'}},
-                   'noise_rates':[.2], 'noise_kind':'symmetric','noise_arms':{'js':{'divergence_type':'js'}},'seeds':[18], 'penalty_target':3}
-                cfg['dataset']='cifar10'
-                load_functions(path(case),dict(env,WAVE5=w)).run(root,cfg,w)
             else:
                 cfg['dataset']='cifar10';rn.CONFIG.update(cfg)
-                opts={'DATASET':'cifar10','ARCH':'resnet50','RUN_ROOT':root,'PENALTY_TARGET':3,
+                opts={'DATASET':'cifar10','ARCH':'resnet50','RUN_ROOT':root,'LT_LAMBDA':1.0,
                       'LT_ARMS':{'js':'js','fisher':'fisher','uniform':'l2'},'LT_FACTORS':[10],
                       'NOISE_ARMS':{'js':'js'},'NOISE_RATES':[.2],'SEEDS':[18],
                       'EPS_FISHER':.01,'SKIP_DONE':False,'MPATH_NAME':'wave5_fisherfix_manifest.json'}

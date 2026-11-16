@@ -6470,303 +6470,6 @@
       }
     }
   },
-  "perturbations": {
-    "calls": [
-      {
-        "op": "train",
-        "epochs": 8,
-        "kwargs": {
-          "train_loader": "train:{'type': 'longtail', 'imbalance_factor': 10}",
-          "val_loader": "val:{'type': 'longtail', 'imbalance_factor': 10}",
-          "test_loader": "test:{'type': 'longtail', 'imbalance_factor': 10}",
-          "embedding_loader": "embedding:{'type': 'longtail', 'imbalance_factor': 10}",
-          "label_list": "names:{'type': 'longtail', 'imbalance_factor': 10}",
-          "model_params": {
-            "arch": "resnet50",
-            "num_classes": 100
-          },
-          "seed": 18,
-          "num_epochs": 8,
-          "num_bins": 15,
-          "lr": 0.1,
-          "momentum": 0.9,
-          "weight_decay": 0.0005,
-          "diag_every_n": 10,
-          "root_path": "runs/cifar10/resnet50/test/w5_lt10_XE/seed_18",
-          "verbose": false,
-          "activation_params": null,
-          "optimizer": "sgd",
-          "lr_schedule": "multistep",
-          "candidate_layers": [
-            "final",
-            "stage_minus_1",
-            "stage_minus_2"
-          ],
-          "embedding_layer": "final",
-          "lr_milestones_frac": [
-            0.4,
-            0.6
-          ],
-          "lr_gamma": 0.1,
-          "loss_params": {
-            "primary_loss": "XE",
-            "secondary_loss": null
-          },
-          "log_graph_maturity": false,
-          "checkpoint_epochs": [
-            3
-          ]
-        }
-      },
-      {
-        "op": "train",
-        "epochs": 5,
-        "kwargs": {
-          "train_loader": "train:{'type': 'longtail', 'imbalance_factor': 10}",
-          "val_loader": "val:{'type': 'longtail', 'imbalance_factor': 10}",
-          "test_loader": "test:{'type': 'longtail', 'imbalance_factor': 10}",
-          "embedding_loader": "embedding:{'type': 'longtail', 'imbalance_factor': 10}",
-          "label_list": "names:{'type': 'longtail', 'imbalance_factor': 10}",
-          "model_params": {
-            "arch": "resnet50",
-            "num_classes": 100
-          },
-          "seed": 18,
-          "num_epochs": 8,
-          "num_bins": 15,
-          "lr": 0.1,
-          "momentum": 0.9,
-          "weight_decay": 0.0005,
-          "diag_every_n": 10,
-          "root_path": "runs/cifar10/resnet50/test/w5_lt10_ncl_js/seed_18",
-          "verbose": false,
-          "activation_params": {
-            "strategy": "fixed",
-            "fixed_epoch": 3
-          },
-          "optimizer": "sgd",
-          "lr_schedule": "multistep",
-          "candidate_layers": [
-            "final",
-            "stage_minus_1",
-            "stage_minus_2"
-          ],
-          "embedding_layer": "final",
-          "lr_milestones_frac": [
-            0.4,
-            0.6
-          ],
-          "lr_gamma": 0.1,
-          "loss_params": {
-            "primary_loss": "XE",
-            "secondary_loss": "ncl",
-            "lambda_reg": 1.0,
-            "secondary_params": {
-              "k": 5,
-              "mask_mode": "none",
-              "divergence_type": "js",
-              "weight_type": "topk",
-              "tau": 1
-            }
-          },
-          "resume_from": "runs/cifar10/resnet50/test/w5_lt10_XE/seed_18/checkpoints/epoch_3.pt",
-          "lambda_kind": "cosine",
-          "lambda_decay": "cosine",
-          "lambda_from_js_target": 3
-        }
-      },
-      {
-        "op": "train",
-        "epochs": 5,
-        "kwargs": {
-          "train_loader": "train:{'type': 'longtail', 'imbalance_factor': 10}",
-          "val_loader": "val:{'type': 'longtail', 'imbalance_factor': 10}",
-          "test_loader": "test:{'type': 'longtail', 'imbalance_factor': 10}",
-          "embedding_loader": "embedding:{'type': 'longtail', 'imbalance_factor': 10}",
-          "label_list": "names:{'type': 'longtail', 'imbalance_factor': 10}",
-          "model_params": {
-            "arch": "resnet50",
-            "num_classes": 100
-          },
-          "seed": 18,
-          "num_epochs": 8,
-          "num_bins": 15,
-          "lr": 0.1,
-          "momentum": 0.9,
-          "weight_decay": 0.0005,
-          "diag_every_n": 10,
-          "root_path": "runs/cifar10/resnet50/test/w5_lt10_ncl_fisher/seed_18",
-          "verbose": false,
-          "activation_params": {
-            "strategy": "fixed",
-            "fixed_epoch": 3
-          },
-          "optimizer": "sgd",
-          "lr_schedule": "multistep",
-          "candidate_layers": [
-            "final",
-            "stage_minus_1",
-            "stage_minus_2"
-          ],
-          "embedding_layer": "final",
-          "lr_milestones_frac": [
-            0.4,
-            0.6
-          ],
-          "lr_gamma": 0.1,
-          "loss_params": {
-            "primary_loss": "XE",
-            "secondary_loss": "ncl",
-            "lambda_reg": 1.0,
-            "secondary_params": {
-              "k": 5,
-              "mask_mode": "none",
-              "divergence_type": "fisher",
-              "weight_type": "topk",
-              "tau": 1
-            }
-          },
-          "resume_from": "runs/cifar10/resnet50/test/w5_lt10_XE/seed_18/checkpoints/epoch_3.pt",
-          "lambda_kind": "cosine",
-          "lambda_decay": "cosine",
-          "lambda_from_js_target": 3
-        }
-      },
-      {
-        "op": "train",
-        "epochs": 8,
-        "kwargs": {
-          "train_loader": "train:{'type': 'noise', 'rate': 0.2, 'kind': 'symmetric'}",
-          "val_loader": "val:{'type': 'noise', 'rate': 0.2, 'kind': 'symmetric'}",
-          "test_loader": "test:{'type': 'noise', 'rate': 0.2, 'kind': 'symmetric'}",
-          "embedding_loader": "embedding:{'type': 'noise', 'rate': 0.2, 'kind': 'symmetric'}",
-          "label_list": "names:{'type': 'noise', 'rate': 0.2, 'kind': 'symmetric'}",
-          "model_params": {
-            "arch": "resnet50",
-            "num_classes": 100
-          },
-          "seed": 18,
-          "num_epochs": 8,
-          "num_bins": 15,
-          "lr": 0.1,
-          "momentum": 0.9,
-          "weight_decay": 0.0005,
-          "diag_every_n": 10,
-          "root_path": "runs/cifar10/resnet50/test/w5_noise20_XE/seed_18",
-          "verbose": false,
-          "activation_params": null,
-          "optimizer": "sgd",
-          "lr_schedule": "multistep",
-          "candidate_layers": [
-            "final",
-            "stage_minus_1",
-            "stage_minus_2"
-          ],
-          "embedding_layer": "final",
-          "lr_milestones_frac": [
-            0.4,
-            0.6
-          ],
-          "lr_gamma": 0.1,
-          "loss_params": {
-            "primary_loss": "XE",
-            "secondary_loss": null
-          },
-          "log_graph_maturity": false,
-          "checkpoint_epochs": [
-            3
-          ]
-        }
-      },
-      {
-        "op": "train",
-        "epochs": 5,
-        "kwargs": {
-          "train_loader": "train:{'type': 'noise', 'rate': 0.2, 'kind': 'symmetric'}",
-          "val_loader": "val:{'type': 'noise', 'rate': 0.2, 'kind': 'symmetric'}",
-          "test_loader": "test:{'type': 'noise', 'rate': 0.2, 'kind': 'symmetric'}",
-          "embedding_loader": "embedding:{'type': 'noise', 'rate': 0.2, 'kind': 'symmetric'}",
-          "label_list": "names:{'type': 'noise', 'rate': 0.2, 'kind': 'symmetric'}",
-          "model_params": {
-            "arch": "resnet50",
-            "num_classes": 100
-          },
-          "seed": 18,
-          "num_epochs": 8,
-          "num_bins": 15,
-          "lr": 0.1,
-          "momentum": 0.9,
-          "weight_decay": 0.0005,
-          "diag_every_n": 10,
-          "root_path": "runs/cifar10/resnet50/test/w5_noise20_ncl_js/seed_18",
-          "verbose": false,
-          "activation_params": {
-            "strategy": "fixed",
-            "fixed_epoch": 3
-          },
-          "optimizer": "sgd",
-          "lr_schedule": "multistep",
-          "candidate_layers": [
-            "final",
-            "stage_minus_1",
-            "stage_minus_2"
-          ],
-          "embedding_layer": "final",
-          "lr_milestones_frac": [
-            0.4,
-            0.6
-          ],
-          "lr_gamma": 0.1,
-          "loss_params": {
-            "primary_loss": "XE",
-            "secondary_loss": "ncl",
-            "lambda_reg": 2,
-            "secondary_params": {
-              "k": 5,
-              "mask_mode": "none",
-              "divergence_type": "js",
-              "weight_type": "topk",
-              "tau": 1
-            }
-          },
-          "resume_from": "runs/cifar10/resnet50/test/w5_noise20_XE/seed_18/checkpoints/epoch_3.pt",
-          "lambda_kind": "cosine",
-          "lambda_decay": "cosine"
-        }
-      }
-    ],
-    "manifests": {
-      "runs/cifar100/resnet50/test/run_manifest.json": {
-        "best_onset": 3,
-        "lambda_cosine": 2
-      },
-      "runs/cifar100/resnet50/test/wave5_manifest.json": {
-        "run_root": "runs/cifar100/resnet50/test",
-        "best_onset": 3,
-        "lambda": 2,
-        "penalty_target": 3,
-        "reportable": {
-          "w5_lt10_XE": {
-            "18": "runs/cifar10/resnet50/test/w5_lt10_XE/seed_18"
-          },
-          "w5_lt10_ncl_js": {
-            "18": "runs/cifar10/resnet50/test/w5_lt10_ncl_js/seed_18"
-          },
-          "w5_lt10_ncl_fisher": {
-            "18": "runs/cifar10/resnet50/test/w5_lt10_ncl_fisher/seed_18"
-          },
-          "w5_noise20_XE": {
-            "18": "runs/cifar10/resnet50/test/w5_noise20_XE/seed_18"
-          },
-          "w5_noise20_ncl_js": {
-            "18": "runs/cifar10/resnet50/test/w5_noise20_ncl_js/seed_18"
-          }
-        },
-        "diverged": [],
-        "errored": []
-      }
-    }
-  },
   "perturbations_matched": {
     "calls": [
       {
@@ -6869,8 +6572,7 @@
           },
           "resume_from": "runs/cifar10/resnet50/test/w5_lt10_XE/seed_18/checkpoints/epoch_3.pt",
           "lambda_kind": "cosine",
-          "lambda_decay": "cosine",
-          "lambda_from_js_target": 3
+          "lambda_decay": "cosine"
         }
       },
       {
@@ -6927,8 +6629,7 @@
           },
           "resume_from": "runs/cifar10/resnet50/test/w5_lt10_XE/seed_18/checkpoints/epoch_3.pt",
           "lambda_kind": "cosine",
-          "lambda_decay": "cosine",
-          "lambda_from_js_target": 3
+          "lambda_decay": "cosine"
         }
       },
       {
@@ -6985,8 +6686,7 @@
           },
           "resume_from": "runs/cifar10/resnet50/test/w5_lt10_XE/seed_18/checkpoints/epoch_3.pt",
           "lambda_kind": "cosine",
-          "lambda_decay": "cosine",
-          "lambda_from_js_target": 3
+          "lambda_decay": "cosine"
         }
       },
       {
@@ -7101,7 +6801,7 @@
       "runs/cifar100/resnet50/test/wave5_fisherfix_manifest.json": {
         "run_root": "runs/cifar100/resnet50/test",
         "best_onset": 3,
-        "penalty_target": 3,
+        "longtail_lambda": 1.0,
         "reportable": {
           "w5_lt10_XE": {
             "18": "runs/cifar10/resnet50/test/w5_lt10_XE/seed_18"

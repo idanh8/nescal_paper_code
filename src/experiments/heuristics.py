@@ -1,6 +1,5 @@
-import os, argparse, numpy as np
+import os
 from experiments.common import run_dir, RunTracker, train_one, write_manifest, load_json, load_pkl
-from data.image_datasets import load_dataset
 import experiments.nescal as run_nescal
 
 def _baseline_dir(run_root, seed): return os.path.join(run_root, 'XE_baseline', f'seed_{seed}')
@@ -60,9 +59,9 @@ def run(run_root, cfg=run_nescal.CONFIG):
                 root = run_dir(base, ds, arch, ts, label, seed)
                 extra = dict(loss_params=lp, resume_from=_ckpt(run_root, seed, onset),
                              activation_params={'strategy': 'fixed', 'fixed_epoch': onset},
-                             lambda_kind='cosine', lambda_decay='cosine', lambda_from_js_target=js_t)
+                             lambda_kind='cosine', lambda_decay='cosine')
                 _, _, div, rp = train_one(tr, label=f'{label} seed={seed} onset={onset} '
-                                                f'{("λ=" + str(lam_v)) if lam_v else "auto-λ"}',
+                                                f'λ={lam_v if lam_v is not None else 1.0}',
                                           epochs_to_train=N - onset,
                                           run_kwargs=run_nescal._base_kwargs(cfg, loaders, seed, root, **extra))
                 manifest['reportable'].setdefault(label, {})[seed] = rp

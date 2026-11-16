@@ -1,6 +1,6 @@
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
-import re, csv, glob, json, math, time, pickle, argparse, importlib, traceback
+import re, csv, glob, math, time, pickle, argparse, importlib, traceback
 import numpy as np
 import torch
 from torch.utils.data import Subset
@@ -99,6 +99,7 @@ def random_simple_walks(neighbors, n_walks, r_max, rng):
 
 
 def walk_steps(P, logP, W):
+    n, R1 = W.shape
     D = np.full((n, R1 - 1), np.nan)
     for l in range(1, R1):
         ok = W[:, l] >= 0

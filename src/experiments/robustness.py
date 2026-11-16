@@ -1,4 +1,4 @@
-import os, argparse, pickle
+import os, pickle
 from experiments.common import load_json
 from handlers.trainer import Trainer, evaluate_corruptions, evaluate_ood_separation
 from data.image_datasets import CIFAR_C_CORRUPTIONS_15
@@ -6,7 +6,7 @@ CORRUPTIONS_15 = CIFAR_C_CORRUPTIONS_15
 
 def _reportable_runs(run_root):
     out = {}
-    for mf in ('run_manifest.json', 'competitors_manifest.json'):
+    for mf in ('run_manifest.json', 'competitors_manifest.json', 'mixup_manifest.json', 'ncr_manifest.json'):
         p = os.path.join(run_root, mf)
         if os.path.exists(p):
             for label, per_seed in load_json(p).get('reportable', {}).items():

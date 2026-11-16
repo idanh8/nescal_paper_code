@@ -1,11 +1,9 @@
-import os, sys, copy, argparse, contextlib
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import sklearn.metrics
+import os, copy, argparse, contextlib
 import numpy as np
 import torch
 import losses.nescal as nescal_mod
 import experiments.nescal as rn
-from experiments.common import run_dir, RunTracker, train_one, write_manifest, load_json, load_pkl
+from experiments.common import RunTracker, train_one, write_manifest, load_json, load_pkl
 
 LABEL = 'abl_randomgraph_matched'
 MANIFEST_NAME = 'random_graph_ablation_manifest_matched.json'

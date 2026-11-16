@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
-from reproduction.recipes import read_recipe, selected_config, competitor_policy, bind_data
+from reproduction.recipes import read_recipe, competitor_policy, bind_data
 from reproduction.cli import parser, prepare, main
 from protocol_recorder import record_suite
 

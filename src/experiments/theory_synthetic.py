@@ -1,7 +1,6 @@
-'Theory synthetic.'
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
-import csv, json, time, argparse, traceback
+import time, argparse, traceback
 import numpy as np
 import torch
 from scipy.stats import spearmanr

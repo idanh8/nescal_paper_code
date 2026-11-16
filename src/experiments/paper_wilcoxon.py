@@ -2,7 +2,6 @@ def main():
     import numpy as np
     from scipy.stats import wilcoxon
 
-    S = ['C10/R50','C10/WRN','C100/R50','C100/WRN','TIN','Helena','Jannis','Covertype','20NG','AMZ5','AMZ2']
     M = ['XE','FL','LS','MMCE','MDCA','s-AvUC','MbLS','NeSCal']
     IT = list(range(8))
 

@@ -172,12 +172,6 @@ class TorchvisionResNet(nn.Module):
         return _package_generic(logits, stage_maps, pooled_final, return_embeddings, embedding_layer)
 
 
-def available_embedding_layers(model: nn.Module) -> list[str]:
-    if isinstance(model, TorchvisionResNet):
-        return ['final', 'stage_minus_1', 'stage_minus_2', 'stage_minus_3']
-    return ['final', 'stage_minus_1', 'stage_minus_2']
-
-
 def create_model(arch: str, num_classes: int, input_channels: int = 3,
                   small_inputs: bool = True, dropout_rate: float = 0.3,
                   pretrained: bool = False, **kwargs) -> nn.Module:
@@ -185,6 +179,7 @@ def create_model(arch: str, num_classes: int, input_channels: int = 3,
     arch options:
       'resnet20', 'resnet32', 'resnet44', 'resnet56', 'resnet110'  
       'wrn-28-10', 'wrn-16-8', 'wrn-22-8',                   
+      'pretrained_vit_b16'
       'resnet18', 'resnet34', 'resnet50'                           
       'mlp', 'frozen_enc_mlp'                                     
 
@@ -193,6 +188,9 @@ def create_model(arch: str, num_classes: int, input_channels: int = 3,
     **kwargs: extra model_params consumed by non-ResNet backbones (e.g. MLP's in_dim,
               hidden_dims, embed_dim); ignored by the ResNet families.
     """
+    if arch.lower() == 'pretrained_vit_b16':
+        from models.pretrained_vit import PretrainedViTB16
+        return PretrainedViTB16(num_classes, **kwargs)
     arch = arch.lower()
 
     if arch in ('mlp', 'frozen_enc_mlp', 'tabular_mlp'):

@@ -2,7 +2,6 @@ import os
 import numpy as np
 import torch
 import torch.nn.functional as F
-from sklearn.calibration import calibration_curve
 import relplot as rp
 from viz.vizlib import plot_calibration_analysis
 import matplotlib.pyplot as plt
@@ -340,6 +339,6 @@ def calibration_metrics(all_softmax_probs, all_labels, all_features, num_bins: i
         cw_plots = len(plot_params['class_names']) <= 10
         plot_calibration_analysis(bcnfs, baccss, bcnts, cw_bin_confidences, cw_bin_accuracies, cw_bin_counts,
                                    cw_ece_list, cw_mce_list, plot_params['class_names'], plot_params['save_path'],
-                                   savename=plot_params['savename'], classwise=cw_plots, residual_analysis=False)
+                                   savename=plot_params['savename'], classwise=cw_plots)
 
     return results

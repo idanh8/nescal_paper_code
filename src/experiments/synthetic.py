@@ -1,11 +1,10 @@
-import os, copy, json, argparse, pickle
+import os, copy, json
 import numpy as np
 
 import experiments.nescal as run_nescal
 import experiments.competitors as run_competitors
 import experiments.posthoc as run_posthoc
-from experiments.common import (timestamp, run_dir, RunTracker, train_one, select_by_val_nll,
-                             write_manifest, load_pkl)
+from experiments.common import run_dir, RunTracker, train_one, select_by_val_nll, write_manifest, load_pkl
 from data.synthetic_datasets import load_synthetic
 from metrics.eta_metrics import (all_eta_metrics, point_eta_metrics, bound_predictiveness,
                                  best_temperature_oracle)
@@ -246,7 +245,6 @@ def figure_bound_predictiveness(cfg, ts, best_onset):
 def figure_activation_criterion(cfg, ts, best_onset, best_lam):
     ds, arch, base = cfg['dataset'], cfg['arch_name'], cfg['base_out']
     run_root = os.path.join(base, ds, arch, ts)
-    sidecar_dir = os.path.join(run_root, 'eta_sidecars')
     seed = cfg['stage_b_seeds'][0]
     from handlers.trainer import Trainer
 

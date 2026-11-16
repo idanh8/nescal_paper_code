@@ -341,7 +341,7 @@ def load_tinyimagenet_c(corruption, severity, batch_size=256, data_root='./data'
     """
     import torchvision
     if not _ensure_corruption_set('Tiny-ImageNet-C', data_root):
-        raise FileNotFoundError(f'Tiny-ImageNet-C unavailable')
+        raise FileNotFoundError('Tiny-ImageNet-C unavailable')
     tf = transforms.Compose([transforms.ToTensor(), transforms.Normalize(TINYIMAGENET_MEAN, TINYIMAGENET_STD)])
     train_dir = os.path.join(data_root, 'tiny-imagenet-200', 'train')
     wnids = sorted(d for d in os.listdir(train_dir) if os.path.isdir(os.path.join(train_dir, d)))

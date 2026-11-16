@@ -1,4 +1,4 @@
-import os, sys, glob, pickle
+import os, glob, pickle
 import numpy as np
 
 

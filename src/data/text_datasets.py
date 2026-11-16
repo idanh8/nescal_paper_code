@@ -1,4 +1,4 @@
-import os, random
+import random
 import numpy as np
 import json
 
@@ -27,13 +27,19 @@ def _load_20ng():
     return (list(tr.data), list(map(int, tr.target))), (list(te.data), list(map(int, te.target))), list(tr.target_names)
 
 
-def _amz_text(ex):
-    t = (ex.get('title') or '') + ' ' + (ex.get('text') or '')
-    return t.strip()
+def _load_20ng_canonical(test_frac=0.2, split_seed=0):
+    import numpy as np
+    from sklearn.datasets import fetch_20newsgroups
+    d = fetch_20newsgroups(subset='all', remove=())
+    texts, labels = list(d.data), np.asarray(d.target, dtype=int)
+    perm = np.random.RandomState(split_seed).permutation(len(labels))
+    n_test = int(len(labels) * test_frac)
+    te_i, tr_i = perm[:n_test], perm[n_test:]
+    return (([texts[i] for i in tr_i], labels[tr_i].tolist()),
+            ([texts[i] for i in te_i], labels[te_i].tolist()), list(d.target_names))
 
 
 def _load_amazon(task, data_root, seed, max_per_class, test_frac):
-    from datasets import load_dataset, concatenate_datasets
     ratings = _AMZ_TASK[task]
     from huggingface_hub import hf_hub_download
     rng = random.Random(seed)

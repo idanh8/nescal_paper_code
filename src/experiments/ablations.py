@@ -1,6 +1,5 @@
-import os, argparse
+import os
 from experiments.common import (run_dir, RunTracker, train_one, write_manifest, load_json)
-from data.image_datasets import load_dataset
 import experiments.nescal as run_nescal
 
 def _ckpt(run_root, seed, epoch):

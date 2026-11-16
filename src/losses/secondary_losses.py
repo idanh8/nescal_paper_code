@@ -1,10 +1,7 @@
 import math
-import warnings
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-from losses.kde_utils import get_bandwidth, get_ece_kde
 
 EPS = 1e-5
 
@@ -181,10 +178,14 @@ class MbLSLoss(nn.Module):
         diff = max_logits - logits
         return F.relu(diff - self.margin).mean()
 
+from losses.ncr import NCRLoss, NeighborVariantLoss, RankMixupLoss
 
 SECONDARY_LOSS_REGISTRY = {
     's-avuc': SoftAvUCLoss,
     'mmce':   MMCELoss,
     'mdca':   MDCALoss,
     'mbls':   MbLSLoss,
+    'ncr': NCRLoss,
+    'nbr_variant': NeighborVariantLoss,
+    'rank_mixup': RankMixupLoss,
 }

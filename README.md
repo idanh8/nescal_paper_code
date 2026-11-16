@@ -74,4 +74,15 @@ python scripts/evaluate_posthoc.py --config configs/examples/image.json \
 
 Use `evaluate_corruptions.py`, `evaluate_ood.py` or `make_tables.py` with `--config` and `--run-root` for the other evaluations. The same interface applies to `run_ablations.py`, `run_random_graph.py` and `run_perturbations.py`. Each script's `--help` lists its options.
 
+The additional experiments in the appendix start from completed image run roots and take one or more `--run-root` paths:
+
+```bash
+python scripts/run_ncr.py --run-root runs/cifar100/resnet50/full runs/cifar10/resnet50/full
+python scripts/run_additional.py --run-root runs/cifar100/resnet50/full --stages factorial divergences
+python scripts/run_backbones.py --stages head vit_ft
+python scripts/additional_tables.py --run-root runs/cifar100/resnet50/full runs/cifar10/resnet50/full
+```
+
+`run_ncr.py` trains NCR under the NeSCal protocol on the coarse grid reported in the paper (`--grid full` adds the remaining cells). `run_additional.py` covers the per-setting analysis, the target and graph factorial, the alternative divergences, the scale and cache arms, and Mixup and RankMixup. `run_backbones.py` covers the frozen pre-trained backbones, ViT-B/16 fine-tuning and the cache benchmark. `additional_tables.py` prints the tables from their outputs.
+
 Experiment implementations are in `src/`; `scripts/` provides the launch commands. Optional orchestration checks run with `python -m unittest discover -s tests -v`; these do not run real training or verify the paper's numerical results.

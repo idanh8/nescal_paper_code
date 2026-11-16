@@ -12,7 +12,6 @@ dependencies:
   - matplotlib
   - seaborn
   - tqdm
-  - pytz
   - conda-forge::faiss-cpu
   - conda-forge::umap-learn
   - pip

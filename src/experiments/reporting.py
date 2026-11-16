@@ -1,17 +1,14 @@
-import os, sys, csv, argparse
+import os, csv
 import numpy as np
 from scipy import stats
-from experiments.common import timestamp, load_json, load_pkl
+from experiments.common import load_json, load_pkl
 import experiments.nescal as run_nescal
-import experiments.competitors as run_competitors
-import experiments.posthoc as run_posthoc
-import experiments.robustness as run_extras
 
 
 MAIN_METRICS = ['accuracy', 'nll', 'brier_score', 'ece', 'equal_mass_ece', 'avg_cw_ece', 'mce', 'lce']
 def _reportable(run_root):
     out = {}
-    for mf in ('run_manifest.json', 'competitors_manifest.json'):
+    for mf in ('run_manifest.json', 'competitors_manifest.json', 'mixup_manifest.json', 'ncr_manifest.json'):
         p = os.path.join(run_root, mf)
         if os.path.exists(p):
             for label, per_seed in load_json(p).get('reportable', {}).items():
@@ -184,7 +181,7 @@ def assemble_report(run_root):
                 p = os.path.join(rp, 'test_results.pkl')
                 if os.path.exists(p): vals.append(load_pkl(p).get(mk))
             return [v for v in vals if v is not None]
-        rows = [['headline (js/hard/k=10)'] + [_fmt(list(_collect(run_root, 'test_results.pkl',
+        rows = [['headline (js/k=10)'] + [_fmt(list(_collect(run_root, 'test_results.pkl',
                  base_metric(mk)).get('ncl_FINAL_cosine', []))) for mk in ('nll', 'ece', 'accuracy')]]
         rows += [[a] + [_fmt(abl_collect(a, mk)) for mk in ('nll', 'ece', 'accuracy')] for a in arms]
         _table('Ablations (test)', rows, ['arm', 'nll', 'ece', 'accuracy'])
@@ -200,7 +197,6 @@ def assemble_report(run_root):
             vals = [load_pkl(os.path.join(rp, 'test_results.pkl')).get('nll')
                     for rp in per.values() if os.path.exists(os.path.join(rp, 'test_results.pkl'))]
             vals = [v for v in vals if v is not None]
-            gates = {s: g for s, g in hm['gate_epochs'].items()} if 'entropy' in label or 'probe' in label or 'cwcc' in label else {}
             rows.append([label, _fmt(vals), f'{np.mean(vals) - grid_nll:+.4f}' if vals else '—'])
         rows = [['grid winner (E*,λ*)', f'{grid_nll:.4f}', '0.0000']] + rows
         realized = [load_pkl(os.path.join(rp, 'train_time_diagnostics.pkl'))['theory'].get('lambda_star')
@@ -258,7 +254,7 @@ def assemble_report(run_root):
                + [['lambda_star × mean_edge_js', f'{ls * mj:.2f}  (compare ≈27)']], ['quantity', 'value'])
 
 
-    w5_mf = os.path.join(run_root, 'wave5_manifest.json')
+    w5_mf = os.path.join(run_root, 'wave5_fisherfix_manifest.json')
     if os.path.exists(w5_mf):
         rep = load_json(w5_mf)['reportable']
         def w5c(label, mk):
@@ -272,7 +268,7 @@ def assemble_report(run_root):
                    ['config', 'nll', 'ece', 'avg_cw_ece', 'accuracy'], rows)
 
 
-    w5_mf = os.path.join(run_root, 'wave5_manifest.json')
+    w5_mf = os.path.join(run_root, 'wave5_fisherfix_manifest.json')
     if os.path.exists(w5_mf):
         rep = load_json(w5_mf)['reportable']; C = run_nescal.CONFIG['model_params']['num_classes']
         def ht(o, key):
@@ -314,67 +310,3 @@ def assemble_report(run_root):
         _write_csv(os.path.join(csv_dir, 'refinement.csv'), ['method', 'brier_cal', 'brier_ref'], rrows)
 
     print(f'\nCSVs written to {csv_dir}', flush=True)
-
-def run_full(nescal_cfg, competitors_cfg=None, do_ablations=True, do_hreg=True, do_wave5=False):
-    import traceback
-    pass
-    ds, arch, base = nescal_cfg['dataset'], nescal_cfg['arch_name'], nescal_cfg['base_out']
-    ts = timestamp()
-    run_root = os.path.join(base, ds, arch, ts)
-    try:
-        run_nescal.run(nescal_cfg, ts)
-        run_competitors.run_root_ref[0] = run_root
-        run_competitors.run(ts, cfg=nescal_cfg, reuse_baseline_ts=ts)
-        if do_ablations:
-            import experiments.ablations as run_ablations; run_ablations.run(run_root, nescal_cfg)
-        if do_hreg:
-            import experiments.heuristics as run_heuristic_regret; run_heuristic_regret.run(run_root, nescal_cfg)
-        if do_wave5:
-            import experiments.perturbations as run_wave5; run_wave5.run(run_root, nescal_cfg)
-        run_posthoc.run(run_root, ds, arch, data_root=nescal_cfg['data_root'],
-                        loader_fn=nescal_cfg.get('loader_fn'))
-        if ds in ('cifar10', 'cifar100', 'tinyimagenet'):
-            run_extras.run(run_root, ds, data_root=nescal_cfg['data_root'])
-        else:
-            print(f'  extras (corruptions/OOD) skipped: image-only, dataset={ds}', flush=True)
-        assemble_report(run_root)
-        pass
-    except Exception:
-        tb = traceback.format_exc()
-        print(tb, flush=True)
-        pass
-        raise
-
-def rerun_nescal_and_finish(nescal_cfg, reuse_competitors_from,
-                            do_ablations=True, do_hreg=True, do_wave5=False, ts=None):
-    import shutil, traceback
-    pass
-    ds, arch, base = nescal_cfg['dataset'], nescal_cfg['arch_name'], nescal_cfg['base_out']
-    ts = ts or timestamp()
-    run_root = os.path.join(base, ds, arch, ts)
-    try:
-        run_nescal.run(nescal_cfg, ts)
-
-        src = os.path.join(base, ds, arch, reuse_competitors_from, 'competitors_manifest.json')
-        os.makedirs(run_root, exist_ok=True)
-        shutil.copy(src, os.path.join(run_root, 'competitors_manifest.json'))
-
-        if do_ablations:
-            import experiments.ablations as ra; ra.run(run_root, nescal_cfg)
-        if do_hreg:
-            import experiments.heuristics as rh; rh.run(run_root, nescal_cfg)
-        if do_wave5:
-            import experiments.perturbations as rw; rw.run(run_root, nescal_cfg)
-
-        run_posthoc.run(run_root, ds, arch, data_root=nescal_cfg['data_root'],
-                        loader_fn=nescal_cfg.get('loader_fn'))
-        if ds in ('cifar10', 'cifar100', 'tinyimagenet'):
-            run_extras.run(run_root, ds, data_root=nescal_cfg['data_root'])
-        else:
-            print(f'  extras (corruptions/OOD) skipped: image-only, dataset={ds}', flush=True)
-        assemble_report(run_root)
-        pass
-    except Exception:
-        tb = traceback.format_exc(); print(tb, flush=True)
-        pass
-        raise

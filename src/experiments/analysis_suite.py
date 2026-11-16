@@ -3,7 +3,6 @@ import re
 import sys
 import glob
 import json
-import pickle
 import argparse
 import warnings
 from collections import defaultdict
@@ -20,7 +19,6 @@ NICE = {'XE_baseline': 'CE', 'FL_FINAL': 'FL', 'ls_alone_FINAL': 'LS', 'mmce_FIN
         'mdca_FINAL': 'MDCA', 's_avuc_FINAL': 's-AvUC', 'mbls_FINAL': 'MbLS',
         'ncl_FINAL_cosine': 'NeSCal', 'ncl_FINAL_constant': 'NeSCal (const)'}
 ORDER = list(NICE)
-NLLSEL_LABEL = {'FL': 'FL_FINAL', 'LS': 'ls_alone_FINAL'}
 
 
 def _resolve(root, p):
@@ -63,12 +61,6 @@ def reportable(root, extra=()):
                         _put(out[lab], seed, rp, lab)
                     else:
                         warnings.warn(f'Unresolved reportable path in {base}: {path}')
-    for base in (root, *extra):
-        for lab, per in _nllsel_overrides(base).items():
-            for seed, rp in per.items():
-                if out[lab].get(seed) != rp:
-                    print(f'[nllsel] {NICE.get(lab, lab)} seed {seed}: {rp}')
-                out[lab][seed] = rp
     return dict(out)
 
 

@@ -79,8 +79,6 @@ def _apply_label_noise(y, PI, is_close, hetero_mode, hetero_strength, rng):
 
 
 def _plot_2d(X, y, is_close, save_path, title):
-    """Save a 2D scatter (first two coords) coloured by class, confusable classes marked — the
-    'here is the data' sanity figure Idan asked for."""
     fig, ax = plt.subplots(figsize=(6.4, 6.0))
     K = int(y.max()) + 1
     cmap = plt.cm.tab10(np.linspace(0, 1, max(K, 10)))

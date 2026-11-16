@@ -1,18 +1,14 @@
-import os, copy, json, argparse, pickle
+import os, copy, json, pickle
 import numpy as np
 
 import experiments.nescal as run_nescal
-import experiments.competitors as run_competitors
-import experiments.posthoc as run_posthoc
-import experiments.ablations as run_ablations
 import experiments.reporting as run_all
-from experiments.common import timestamp, run_dir, RunTracker, train_one, load_pkl, load_json
-from data.frozen_datasets import (load_frozen, frozen_dim, load_frozen_corruption, load_frozen_ood)
+from experiments.common import load_pkl
+from data.frozen_datasets import load_frozen, load_frozen_corruption, load_frozen_ood
 import encoders.extract_embeddings as extract_embeddings
 
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
 CIFAR_C_15 = extract_embeddings.CIFAR_C_15
 
@@ -114,34 +110,6 @@ def frozen_extras(run_root, dataset, encoder, cfg, task=None):
                 except Exception as e:
                     print(f'  [frozen_extras] OOD skipped for {label} seed={seed} ({type(e).__name__}: {e})', flush=True)
     print('[frozen_extras] robustness/OOD written', flush=True)
-
-
-def run_main(dataset, encoder, ts, task=None, resume_cfg=None):
-    cfg = (resume_cfg if resume_cfg is not None else _make_cfg(dataset, encoder, CONFIG['head_hidden_dims'], task=task))
-    run_root = os.path.join(cfg['base_out'], cfg['dataset'], cfg['arch_name'], ts)
-    if resume_cfg is None:
-        run_nescal.run(cfg, ts)
-        run_competitors.run_root_ref[0] = run_root
-        run_competitors.run(ts, cfg=cfg, reuse_baseline_ts=ts)
-        run_ablations.run(run_root, cfg)
-    run_posthoc.POSTHOC = ('ts', 'local', 'dc', 'dac', 'lore')
-    run_posthoc.run(run_root, cfg['dataset'], cfg['arch_name'], data_root=cfg['data_root'], num_bins=cfg['num_bins'], batch_size=cfg['batch_size'], num_workers=cfg['num_workers'], loader_fn=cfg['loader_fn'],)
-    if (cfg['do_robustness'] or cfg['do_ood']) and dataset in ('cifar10', 'cifar100') and encoder in ('vit_b16', 'dinov2'):
-        frozen_extras(run_root, dataset, encoder, cfg, task=task)
-    run_dropout_ablation(dataset, encoder, ts, task=task)
-    run_all.assemble_report(run_root)
-    return run_root
-
-
-def run_headline_only(dataset, encoder, ts, task=None, resume_cfg=None):
-    cfg = (resume_cfg if resume_cfg is not None else _make_cfg(dataset, encoder, CONFIG['head_hidden_dims'], task=task))
-    run_root = os.path.join(cfg['base_out'], cfg['dataset'], cfg['arch_name'], ts)
-    if resume_cfg is None:
-        run_nescal.run(cfg, ts)
-    run_posthoc.POSTHOC = ('local',)
-    run_posthoc.run(run_root, cfg['dataset'], cfg['arch_name'], data_root=cfg['data_root'], num_bins=cfg['num_bins'], batch_size=cfg['batch_size'], num_workers=cfg['num_workers'], loader_fn=cfg['loader_fn'],)
-    run_all.assemble_report(run_root)
-    return run_root
 
 
 def run_dropout_ablation(dataset, encoder, ts, task=None):

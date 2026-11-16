@@ -1,7 +1,6 @@
 import os
-import numpy as np
 import torch
-from torch.utils.data import DataLoader, Dataset, Subset, TensorDataset, random_split
+from torch.utils.data import DataLoader, Subset, TensorDataset, random_split
 from data.image_datasets import IndexedImageDataset
 
 FROZEN_ROOT = './data/frozen'
@@ -13,10 +12,6 @@ def _base(dataset, encoder, base_dir=None):
     if not os.path.exists(fp):
         raise FileNotFoundError(f'{fp} missing — run embedding extraction first')
     return torch.load(fp, map_location='cpu')
-
-
-def frozen_dim(dataset, encoder, base_dir=None):
-    return int(_base(dataset, encoder, base_dir)['enc_dim'])
 
 
 def load_frozen(dataset, encoder, val_split=0.1, batch_size=256, seed=42, num_workers=0, base_dir=None, split_seed=42, **_ignored):

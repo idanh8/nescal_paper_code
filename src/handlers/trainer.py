@@ -2,7 +2,6 @@ import os
 import copy
 import pickle
 import math
-from xml.parsers.expat import model
 import numpy as np
 import torch
 import torch.optim as optim
@@ -173,7 +172,7 @@ class Trainer:
     def __init__(self, model_params: dict, loss_params: dict, seed: int = 42, lr: float = 0.1,
                  momentum: float = 0.9, weight_decay: float = 5e-4, lr_milestones_frac=(0.5, 0.75),
                  lr_gamma: float = 0.1, num_epochs: int = 200, embedding_layer: str = 'final', use_amp: bool = True,
-                 lr_schedule: str = 'multistep', optimizer: str = 'sgd'):
+                 lr_schedule: str = 'multistep', optimizer: str = 'sgd', mixup_alpha: float = None):
         set_seed(seed)
         self.model_params = model_params
         self.embedding_layer = embedding_layer
@@ -217,6 +216,7 @@ class Trainer:
         self.eval_criterion = get_loss('XE', None, loss_params)
         self._inner_secondary = getattr(self.criterion, 'secondary_loss_fn', None)
         self.lce_projection = None
+        self.mixup_alpha = mixup_alpha
 
     @property
     def secondary_active(self):
@@ -267,8 +267,35 @@ class Trainer:
 
             self.optimizer.zero_grad(set_to_none=True)
             with torch.autocast(device_type='cuda', enabled=self.use_amp):
-                outputs = self.model(images)
-                total_loss, primary_loss, secondary_loss = self.criterion(outputs, labels, node_indices=idx)
+                if getattr(self._inner_secondary, 'requires_mixup', False):
+                    _a = self._inner_secondary.alpha
+                    _lam = float(np.random.beta(_a, _a))
+                    _perm = torch.randperm(images.size(0), device=images.device)
+                    outputs = self.model(images)
+                    _mixed = self.model(_lam * images + (1.0 - _lam) * images[_perm])
+                    total_loss, primary_loss, secondary_loss = self.criterion(outputs, labels, node_indices=idx, mixed_logits=_mixed)
+                elif self.mixup_alpha and self._inner_secondary is not None:
+                    _lam = float(np.random.beta(self.mixup_alpha, self.mixup_alpha))
+                    _perm = torch.randperm(images.size(0), device=images.device)
+                    outputs = self.model(_lam * images + (1.0 - _lam) * images[_perm])
+                    _prim = self.criterion.primary_loss_fn
+                    primary_loss = _lam * _prim(outputs, labels) + (1.0 - _lam) * _prim(outputs, labels[_perm])
+                    secondary_loss = self._inner_secondary(self.model(images), labels, node_indices=idx) if self.secondary_active \
+                        else torch.zeros((), device=images.device)
+                    total_loss = primary_loss + self.criterion.lambda_reg * secondary_loss
+                elif self.mixup_alpha:
+                    _lam = float(np.random.beta(self.mixup_alpha, self.mixup_alpha))
+                    _perm = torch.randperm(images.size(0), device=images.device)
+                    outputs = self.model(_lam * images + (1.0 - _lam) * images[_perm])
+                    _la = self.criterion(outputs, labels, node_indices=idx)
+                    _lb = self.criterion(outputs, labels[_perm], node_indices=idx)
+                    total_loss, primary_loss, secondary_loss = (_lam * a + (1.0 - _lam) * b for a, b in zip(_la, _lb))
+                elif getattr(self._inner_secondary, 'requires_features', False):
+                    outputs, _feats = self.model(images, embedding_layer=self.embedding_layer)
+                    total_loss, primary_loss, secondary_loss = self.criterion(outputs, labels, node_indices=idx, features=_feats)
+                else:
+                    outputs = self.model(images)
+                    total_loss, primary_loss, secondary_loss = self.criterion(outputs, labels, node_indices=idx)
 
             self.scaler.scale(total_loss).backward()
             self.scaler.step(self.optimizer)
@@ -383,7 +410,8 @@ class Trainer:
             'lr': self.lr, 'momentum': self.momentum, 'weight_decay': self.weight_decay,
             'lr_milestones_frac': self.lr_milestones_frac, 'lr_gamma': self.lr_gamma,
             'num_epochs': self.num_epochs, 'embedding_layer': self.embedding_layer, 'use_amp': self.use_amp,
-            'lr_milestones_frac': self.lr_milestones_frac, 'lr_gamma': self.lr_gamma, 'lr_schedule': self.lr_schedule,
+            'lr_schedule': self.lr_schedule,
+            'mixup_alpha': self.mixup_alpha,
         }
 
     @classmethod
@@ -482,10 +510,10 @@ def train_model(train_loader, val_loader, test_loader, embedding_loader, label_l
                                   graph_recompute_every=None, early_stopping: bool = False, early_stopping_patience: int = 10,
                                   lambda_kind='constant', lambda_decay='cosine', lambda_off_frac=0.5,
                                   diag_every_n=10, checkpoint_epochs=None, resume_from=None, log_graph_maturity=False,
-                                  root_path='./ncl_resnet', verbose=False, lambda_from_js_target=None, lambda_from_penalty_target=None,
+                                  root_path='./ncl_resnet', verbose=False, lambda_from_penalty_target=None,
                                   corruptions=None, corruption_severities=(1, 2, 3, 4, 5), corruption_base=None, data_root='./data',
                                   run_ood=False, ood_base=None, optimizer='sgd', lr_milestones_frac=(0.5, 0.75), lr_gamma=0.1,
-                                  save_selection_ckpts=False):
+                                  mixup_alpha=None, save_selection_ckpts=False):
     
     os.makedirs(root_path, exist_ok=True)
     plots_path = os.path.join(root_path, 'plots')
@@ -510,7 +538,8 @@ def train_model(train_loader, val_loader, test_loader, embedding_loader, label_l
 
     model = Trainer(model_params, loss_params, seed=seed, lr=lr, momentum=momentum,
                                     weight_decay=weight_decay, num_epochs=num_epochs, embedding_layer=embedding_layer,
-                                    use_amp=use_amp, lr_schedule=lr_schedule, optimizer=optimizer, lr_gamma=lr_gamma, lr_milestones_frac=lr_milestones_frac)
+                                    use_amp=use_amp, lr_schedule=lr_schedule, optimizer=optimizer, lr_gamma=lr_gamma, lr_milestones_frac=lr_milestones_frac,
+                                    mixup_alpha=mixup_alpha)
     inner_secondary = getattr(model.criterion, 'secondary_loss_fn', None)
     needs_activation = getattr(inner_secondary, 'requires_activation', False)
 

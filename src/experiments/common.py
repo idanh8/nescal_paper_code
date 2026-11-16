@@ -1,8 +1,4 @@
-import os, sys, time, json, datetime
-
-
-_SRC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if _SRC not in sys.path: sys.path.insert(0, _SRC)
+import os, time, json, datetime
 
 from handlers.trainer import train_model
 from utils.general_utils import DivergedRun
@@ -20,15 +16,10 @@ class RunTracker:
         self.total = max(total_epochs_planned, 1); self.done_epochs = 0
         self.sec_per_epoch = None; self.t0 = time.time(); self.label = label; self.n_runs = 0
 
-    def _fmt_eta(self, secs):
-        return (datetime.datetime.now() + datetime.timedelta(seconds=secs)).strftime('%a %H:%M')
-
     def record(self, epochs_trained, elapsed_s):
         self.n_runs += 1; self.done_epochs += epochs_trained
         rate = elapsed_s / max(epochs_trained, 1)
         self.sec_per_epoch = rate if self.sec_per_epoch is None else 0.7 * self.sec_per_epoch + 0.3 * rate
-        remaining = (self.total - self.done_epochs) * self.sec_per_epoch
-        pct = 100.0 * self.done_epochs / self.total
         print(f'[{self.label}] run {self.n_runs} done ({epochs_trained} ep, {elapsed_s/60:.1f} min).')
 
 def train_one(tracker, *, label, epochs_to_train, run_kwargs):
@@ -58,19 +49,8 @@ def write_manifest(path, obj):
     print(f'[manifest] wrote {path}', flush=True)
 
 
-import numpy as np, pickle
+import pickle
 
-def _jsonable(o):
-    if isinstance(o, dict): return {k: _jsonable(v) for k, v in o.items()}
-    if isinstance(o, (list, tuple)): return [_jsonable(v) for v in o]
-    if isinstance(o, (np.floating, np.integer)): return float(o)
-    if isinstance(o, np.ndarray): return None
-    return o
-
-def save_results(root_path, val_results, test_results):
-    """Insurance so the report never hard-depends on posthoc having run."""
-    with open(os.path.join(root_path, 'results.json'), 'w') as f:
-        json.dump({'val': _jsonable(val_results), 'test': _jsonable(test_results)}, f, indent=2)
 
 def load_json(path):
     with open(path) as f: return json.load(f)

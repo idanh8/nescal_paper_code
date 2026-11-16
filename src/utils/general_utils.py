@@ -1,5 +1,3 @@
-import pytz
-import datetime
 import os
 import math
 import random
@@ -24,13 +22,6 @@ def make_lambda_schedule(kind, lam_peak, onset, E, off_frac=0.5, decay='cosine')
         return float(lam_peak) * 0.5 * (1.0 + math.cos(math.pi * min(t, 1.0)))
     f.off_epoch = off_epoch
     return f
-
-
-def get_timestamp():
-  gmt_plus_3 = pytz.timezone('Etc/GMT-3')
-  now = datetime.datetime.now(gmt_plus_3)
-  timestamp = now.strftime('%Y-%m-%d-%H%M')
-  return timestamp
 
 
 def set_seed(seed=42):

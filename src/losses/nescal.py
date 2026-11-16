@@ -62,13 +62,16 @@ class PreNeighborhoodConsistencyLoss(nn.Module):
         self.update_global_probs(initial_probs)
         with torch.no_grad():
             nb = self.neighbors.to(initial_probs.device)
-            pj = self.global_probs[nb]
-            pi = self.global_probs.unsqueeze(1).expand_as(pj)
-            pi_flat = pi.reshape(-1, pi.shape[-1]); pj_flat = pj.reshape(-1, pj.shape[-1])
-
-
-            self.mean_edge_penalty_at_activation = float(self._edge_divergence(pi_flat, pj_flat).mean().item())
-            self.mean_edge_js_at_activation = float(js_divergence_torch(pi_flat, pj_flat).mean().item())
+            pen_sum, js_sum, n_edges = 0.0, 0.0, 0
+            for s in range(0, nb.shape[0], 4096):
+                nb_c = nb[s:s + 4096]
+                pj_flat = self.global_probs[nb_c].reshape(-1, self.global_probs.shape[1])
+                pi_flat = self.global_probs[s:s + 4096].repeat_interleave(nb_c.shape[1], dim=0)
+                pen_sum += float(self._edge_divergence(pi_flat, pj_flat).sum().item())
+                js_sum += float(js_divergence_torch(pi_flat, pj_flat).sum().item())
+                n_edges += pi_flat.shape[0]
+            self.mean_edge_penalty_at_activation = pen_sum / n_edges
+            self.mean_edge_js_at_activation = js_sum / n_edges
         if node_labels is not None:
             self.node_labels = torch.as_tensor(node_labels, dtype=torch.long)
         self.active = True

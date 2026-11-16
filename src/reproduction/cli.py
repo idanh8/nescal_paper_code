@@ -4,15 +4,13 @@ from copy import deepcopy
 from datetime import datetime
 import json
 from pathlib import Path
-import sys
 from reproduction.recipes import (read_recipe, selected_config, competitor_policy,
                                   bind_data, serializable_config, override, method_name)
 
 STAGES = ('nescal', 'competitors', 'posthoc', 'corruptions', 'ood', 'report',
           'ablations', 'random-graph', 'heuristics', 'perturbations',
-          'perturbations-original', 'perturbations-longtail', 'author-recipes',
           'synthetic', 'synthetic-figures', 'extract', 'frozen-depth', 'frozen-dropout',
-          'headline-selection', 'onset-control')
+          'headline-selection')
 
 
 def parser(default_stage=None):
@@ -119,12 +117,9 @@ def _set_core_config(cfg):
 def _perturbation_options(module, recipe, cfg, root):
     module.DATASET, module.ARCH, module.RUN_ROOT = cfg['dataset'], cfg['arch_name'], root
     options = recipe.get('perturbations', {})
-    names = {'seeds': 'SEEDS', 'penalty_target': 'PENALTY_TARGET', 'eps_fisher': 'EPS_FISHER',
+    names = {'seeds': 'SEEDS', 'longtail_lambda': 'LT_LAMBDA', 'eps_fisher': 'EPS_FISHER',
              'longtail_factors': 'LT_FACTORS', 'noise_rates': 'NOISE_RATES',
              'longtail_arms': 'LT_ARMS', 'noise_arms': 'NOISE_ARMS', 'skip_done': 'SKIP_DONE'}
-    if hasattr(module, 'FACTORS'):
-        names['longtail_factors'] = 'FACTORS'
-        names['longtail_arms'] = 'ARMS'
     for key, name in names.items():
         if key in options:
             setattr(module, name, options[key])
@@ -190,27 +185,13 @@ def execute_stage(stage, recipe, cfg, root, tag, args):
             raise ValueError('\n'.join(problems))
         run_setting(root, mf, oldcfg, par, seeds, onset, matched=args.scale_matched)
         _summarize(root, mf, oldcfg)
-    elif stage.startswith('perturbations'):
+    elif stage == 'perturbations':
         if cfg['dataset'] not in ('cifar10', 'cifar100'):
             raise ValueError('Perturbation stages require CIFAR.')
-        if stage == 'perturbations-original':
-            from experiments import perturbations
-            options = deepcopy(perturbations.WAVE5)
-            options.update(recipe.get('perturbations', {}))
-            perturbations.run(root, cfg, options)
-        else:
-            from experiments import perturbations_matched, perturbations_longtail
-            module = perturbations_matched if stage == 'perturbations' else perturbations_longtail
-            _perturbation_options(module, recipe, cfg, root)
-            module.run()
-            if stage == 'perturbations':
-                module.build_report()
-    elif stage == 'author-recipes':
-        from experiments import author_recipes
-        if 'author_seeds' in recipe:
-            author_recipes.SEEDS = recipe['author_seeds']
-        author_recipes.run(root, cfg)
-        author_recipes.report(root)
+        from experiments import perturbations_matched as module
+        _perturbation_options(module, recipe, cfg, root)
+        module.run()
+        module.build_report()
     elif stage == 'synthetic':
         from experiments import synthetic, competitors
         competitors.method_specs, competitors.fl_primary_spec = competitor_policy(recipe, args.mode)
@@ -237,11 +218,6 @@ def execute_stage(stage, recipe, cfg, root, tag, args):
         Path(root, 'relock_decision.json').write_text(json.dumps({
             'best_onset': onset, 'lambda_cosine': lam, 'lr_schedule': schedule, **decision}, indent=2))
         print('Selection complete. The decision is in relock_decision.json; constant lambda is still a separate selection.')
-    elif stage == 'onset-control':
-        from experiments.onset_control import main
-        if not recipe.get('onset_jobs'):
-            raise ValueError('onset-control requires the original job policy in recipe.onset_jobs.')
-        main(recipe['onset_jobs'])
     elif stage == 'extract':
         print('Embedding cache:', cfg['embedding_dir'])
     else:

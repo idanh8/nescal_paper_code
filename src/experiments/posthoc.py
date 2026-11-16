@@ -1,4 +1,4 @@
-import os, sys, argparse, pickle
+import os, pickle
 from experiments.common import load_json
 from data.image_datasets import load_dataset
 from handlers.trainer import Trainer, _embed_probs_labels
@@ -6,11 +6,10 @@ from posthoc.calibrators import apply_posthoc_suite
 
 POSTHOC = ('ts', 'local', 'dc', 'dac', 'lore')
 
-def _seed_of(run_path): return int(os.path.basename(run_path).split('_')[-1])
 
 def _reportable_runs(run_root):
     out = {}
-    for mf in ('run_manifest.json', 'competitors_manifest.json'):
+    for mf in ('run_manifest.json', 'competitors_manifest.json', 'mixup_manifest.json', 'ncr_manifest.json'):
         p = os.path.join(run_root, mf)
         if os.path.exists(p):
             for label, per_seed in load_json(p).get('reportable', {}).items():
